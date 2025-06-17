@@ -10,12 +10,19 @@ public class EnemyStateMachine : MonoBehaviour
     
     private Player _target;
     private State _currentState;
+    private Enemy _enemy;
 
     public State Current => _currentState;
 
-    private void Start()
+    private void Awake()
     {
-        _target = GetComponent<Enemy>().Target;
+        _enemy = GetComponent<Enemy>();
+    }
+
+    public void Initialize(Player target)
+    {
+        _target = target;
+        ResetState(_firstState);
     }
 
     private void Update()
@@ -32,7 +39,16 @@ public class EnemyStateMachine : MonoBehaviour
 
     private void Transit(State nextState)
     {
-        throw new NotImplementedException();
+        if (_currentState != null)
+        {
+            _currentState.Exit();
+        }
+
+        _currentState = nextState;
+        if (_currentState != null)
+        {
+            _currentState.Enter(_target);
+        }
     }
 
     private void ResetState(State startState)
@@ -43,5 +59,18 @@ public class EnemyStateMachine : MonoBehaviour
         {
             _currentState.Enter(_target);
         }
+    }
+    
+    public void ForceState(State newState)
+    {
+        if (newState != null)
+        {
+            Transit(newState);
+        }
+    }
+    
+    public void ResetToFirstState()
+    {
+        ResetState(_firstState);
     }
 }

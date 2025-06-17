@@ -9,7 +9,7 @@ public class PlayerMover : MonoBehaviour
     [Header("Скорости движения")]
     [SerializeField] private float _walkSpeed = 3f;
     [SerializeField] private float _runSpeed = 6f;
-    [SerializeField] private float _crouchSpeed = 1.5f;
+    [SerializeField] private float _stealthSpeed = 1.5f;
     
     [Header("Настройки перегруза")]
     [SerializeField] private float _overloadSpeedMultiplier = 0.5f;
@@ -19,9 +19,13 @@ public class PlayerMover : MonoBehaviour
     [SerializeField] private float _stealthSpeedMultiplier = 0.7f;
     [SerializeField] private float _noiseLevel = 1f;
     
+    [Header("Настройки камеры")]
+    [SerializeField] private float _mouseSensitivity = 2f;
+    [SerializeField] private Transform _cameraHolder;
+    [SerializeField] private float _maxLookAngle = 80f;
+    
     private float _currentSpeed;
     private bool _isOverloaded = false;
-    private bool _isCrouching = false;
     private bool _isRunning = false;
     private bool _isStealthMode = false;
     
@@ -29,16 +33,15 @@ public class PlayerMover : MonoBehaviour
     private PlayerInventory _inventory;
     private Rigidbody _rigidbody;
     private Vector3 _moveDirection;
+    private float _verticalRotation = 0f;
     
     public bool IsOverloaded => _isOverloaded;
-    public bool IsCrouching => _isCrouching;
     public bool IsRunning => _isRunning;
     public bool IsStealthMode => _isStealthMode;
     public float CurrentSpeed => _currentSpeed;
     public float NoiseLevel => _noiseLevel;
     
     public event UnityAction<bool> OverloadChanged;
-    public event UnityAction<bool> CrouchChanged;
     public event UnityAction<bool> RunChanged;
     public event UnityAction<bool> StealthModeChanged;
     public event UnityAction<float> SpeedChanged;
@@ -49,12 +52,24 @@ public class PlayerMover : MonoBehaviour
         _inventory = GetComponent<PlayerInventory>();
         _rigidbody = GetComponent<Rigidbody>();
         
-        // if (_rigidbody == null)
-        // {
-        //     _rigidbody = gameObject.AddComponent<Rigidbody>();
-        //     _rigidbody.freezeRotation = true;
-        //     _rigidbody.drag = 1f;
-        // }
+        if (_cameraHolder == null)
+        {
+            GameObject cameraHolder = new GameObject("CameraHolder");
+            cameraHolder.transform.SetParent(transform);
+            cameraHolder.transform.localPosition = new Vector3(0, 1.6f, 0); // Высота глаз
+            _cameraHolder = cameraHolder.transform;
+        }
+        
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            mainCamera.transform.SetParent(_cameraHolder);
+            mainCamera.transform.localPosition = Vector3.zero;
+            mainCamera.transform.localRotation = Quaternion.identity;
+        }
+        
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
     
     private void Start()
@@ -65,6 +80,7 @@ public class PlayerMover : MonoBehaviour
     private void Update()
     {
         HandleInput();
+        HandleMouseLook();
         UpdateSpeed();
         UpdateNoiseLevel();
     }
@@ -76,11 +92,22 @@ public class PlayerMover : MonoBehaviour
     
     private void HandleInput()
     {
+        // Получаем направление движения относительно камеры
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        _moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
         
-        // Переключение режимов движения
+        // Преобразуем ввод в локальные координаты камеры
+        Vector3 forward = _cameraHolder.forward;
+        Vector3 right = _cameraHolder.right;
+        
+        // Убираем Y компонент для движения только в горизонтальной плоскости
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+        
+        _moveDirection = (forward * vertical + right * horizontal).normalized;
+        
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             ToggleRun();
@@ -88,23 +115,30 @@ public class PlayerMover : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
-            ToggleCrouch();
-        }
-        
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
             ToggleStealthMode();
         }
+        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleCursorLock();
+        }
+    }
+    
+    private void HandleMouseLook()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity;
+        transform.Rotate(0, mouseX, 0);
+        
+        float mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity;
+        _verticalRotation -= mouseY;
+        _verticalRotation = Mathf.Clamp(_verticalRotation, -_maxLookAngle, _maxLookAngle);
+        _cameraHolder.localRotation = Quaternion.Euler(_verticalRotation, 0, 0);
     }
     
     private void Move()
     {
         if (_moveDirection.magnitude > 0.1f)
         {
-            // Поворачиваем персонажа в направлении движения
-            Quaternion targetRotation = Quaternion.LookRotation(_moveDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.fixedDeltaTime);
-            
             Vector3 velocity = _moveDirection * _currentSpeed;
             _rigidbody.velocity = new Vector3(velocity.x, _rigidbody.velocity.y, velocity.z);
         }
@@ -118,13 +152,13 @@ public class PlayerMover : MonoBehaviour
     {
         float baseSpeed = _walkSpeed;
         
-        if (_isRunning && !_isCrouching)
+        if (_isRunning && !_isStealthMode)
         {
             baseSpeed = _runSpeed;
         }
-        else if (_isCrouching)
+        else if (_isStealthMode)
         {
-            baseSpeed = _crouchSpeed;
+            baseSpeed = _stealthSpeed;
         }
         
         float speedMultiplier = 1f;
@@ -132,11 +166,6 @@ public class PlayerMover : MonoBehaviour
         if (_isOverloaded)
         {
             speedMultiplier *= _overloadSpeedMultiplier;
-        }
-        
-        if (_isStealthMode)
-        {
-            speedMultiplier *= _stealthSpeedMultiplier;
         }
         
         if (_player != null)
@@ -152,19 +181,16 @@ public class PlayerMover : MonoBehaviour
     {
         float baseNoise = 1f;
         
-        // Увеличиваем шум при беге
         if (_isRunning)
         {
             baseNoise = 2f;
         }
         
-        // Уменьшаем шум при крадущемся движении
-        if (_isCrouching || _isStealthMode)
+        if (_isStealthMode)
         {
             baseNoise *= 0.3f;
         }
         
-        // Увеличиваем шум при перегрузе
         if (_isOverloaded)
         {
             baseNoise *= 1.5f;
@@ -183,21 +209,9 @@ public class PlayerMover : MonoBehaviour
         }
     }
     
-    public void ToggleCrouch()
-    {
-        _isCrouching = !_isCrouching;
-        CrouchChanged?.Invoke(_isCrouching);
-        
-        if (_isCrouching && !_isStealthMode)
-        {
-            _isStealthMode = true;
-            StealthModeChanged?.Invoke(_isStealthMode);
-        }
-    }
-    
     public void ToggleRun()
     {
-        if (!_isCrouching)
+        if (!_isStealthMode) // Нельзя бежать в стелс-режиме
         {
             _isRunning = !_isRunning;
             RunChanged?.Invoke(_isRunning);
@@ -209,10 +223,25 @@ public class PlayerMover : MonoBehaviour
         _isStealthMode = !_isStealthMode;
         StealthModeChanged?.Invoke(_isStealthMode);
         
-        if (!_isStealthMode && _isCrouching)
+        // Если включаем стелс, выключаем бег
+        if (_isStealthMode && _isRunning)
         {
-            _isCrouching = false;
-            CrouchChanged?.Invoke(_isCrouching);
+            _isRunning = false;
+            RunChanged?.Invoke(_isRunning);
+        }
+    }
+    
+    private void ToggleCursorLock()
+    {
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
     }
     
@@ -232,7 +261,6 @@ public class PlayerMover : MonoBehaviour
         return _moveDirection;
     }
     
-    // Метод для внешнего обновления перегруза
     public void UpdateOverloadStatus(int currentWeight, int maxWeight)
     {
         float overloadRatio = (float)currentWeight / maxWeight;

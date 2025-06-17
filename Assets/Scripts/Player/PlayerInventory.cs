@@ -178,25 +178,7 @@ public class PlayerInventory : MonoBehaviour
     
     private int GetItemWeight(Goods item)
     {
-        // Базовая логика веса товаров
-        // В будущем нужно добавить поле Weight в Goods ScriptableObject
-        
-        string itemName = item.Label.ToLower();
-        
-        // Хрупкие предметы (яйца, огурцы)
-        if (itemName.Contains("яйцо") || itemName.Contains("огурец") || itemName.Contains("помидор"))
-        {
-            return Mathf.RoundToInt(_fragileItemWeight);
-        }
-        
-        // Тяжелые предметы (алкоголь, консервы)
-        if (itemName.Contains("водка") || itemName.Contains("пиво") || itemName.Contains("консерв"))
-        {
-            return Mathf.RoundToInt(_heavyItemWeight);
-        }
-        
-        // Обычные товары
-        return Mathf.RoundToInt(_weightPerItem);
+        return Mathf.RoundToInt(item.Weight);
     }
     
     private void UpdateOverloadStatus()
@@ -243,5 +225,63 @@ public class PlayerInventory : MonoBehaviour
     public int GetFreeSlots()
     {
         return _maxItems - _goods.Count;
+    }
+    
+    public List<Goods> GetStolenItems()
+    {
+        return new List<Goods>(_goods);
+    }
+    
+    public void RemoveItem(Goods item)
+    {
+        TryRemoveItem(item);
+    }
+    
+    public void RemoveItems(List<Goods> items)
+    {
+        foreach (var item in items)
+        {
+            TryRemoveItem(item);
+        }
+    }
+    
+    public int GetStolenItemsCount()
+    {
+        return _goods.Count;
+    }
+    
+    public bool HasStolenItems()
+    {
+        return _goods.Count > 0;
+    }
+    
+    public List<Goods> GetItemsByType(GoodsType type)
+    {
+        List<Goods> itemsOfType = new List<Goods>();
+        
+        foreach (var item in _goods)
+        {
+            if (item.Type == type)
+            {
+                itemsOfType.Add(item);
+            }
+        }
+        
+        return itemsOfType;
+    }
+    
+    public int GetItemsValueByType(GoodsType type)
+    {
+        int totalValue = 0;
+        
+        foreach (var item in _goods)
+        {
+            if (item.Type == type)
+            {
+                totalValue += item.Price;
+            }
+        }
+        
+        return totalValue;
     }
 }

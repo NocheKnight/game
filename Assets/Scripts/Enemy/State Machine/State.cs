@@ -20,11 +20,28 @@ public abstract class State : MonoBehaviour
             transition.enabled = true;
             transition.Init(target);
         }
+        
+        OnEnter();
+    }
+    
+    public void Exit()
+    {
+        if (!enabled) return;
+        
+        OnExit();
+        enabled = false;
+        foreach (var transition in _transitions)
+        {
+            transition.enabled = false;
+        }
     }
 
     public State GetNext()
     {
         return _transitions.Where(transition => transition.NeedTransit).Select(transition => transition.TargetState).FirstOrDefault();
     }
+    
+    protected virtual void OnEnter() { }
+    protected virtual void OnExit() { }
 }
 
