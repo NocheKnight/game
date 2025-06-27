@@ -73,4 +73,24 @@ public class EnemyStateMachine : MonoBehaviour
     {
         ResetState(_firstState);
     }
+
+    public void SetPatrolDestination(Vector3 destination)
+    {
+        var patrolState = GetComponent<PatrolState>();
+        if (patrolState != null)
+        {
+            // Создаем временный объект-точку
+            GameObject tempPoint = new GameObject("TempDistractionPoint");
+            tempPoint.transform.position = destination;
+
+            // Передаем эту точку в состояние патрулирования
+            patrolState.SetPatrolPoints(new Transform[] { tempPoint.transform });
+
+            // Переключаем в состояние патрулирования
+            ForceState(patrolState);
+            
+            // Уничтожаем временную точку через некоторое время
+            Destroy(tempPoint, 10f); // 10 секунд на расследование
+        }
+    }
 }

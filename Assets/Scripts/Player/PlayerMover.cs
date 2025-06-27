@@ -79,8 +79,6 @@ public class PlayerMover : MonoBehaviour
     
     private void Update()
     {
-        HandleInput();
-        HandleMouseLook();
         UpdateSpeed();
         UpdateNoiseLevel();
     }
@@ -90,47 +88,24 @@ public class PlayerMover : MonoBehaviour
         Move();
     }
     
-    private void HandleInput()
+    public void SetMoveDirection(Vector2 direction)
     {
-        // Получаем направление движения относительно камеры
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        
-        // Преобразуем ввод в локальные координаты камеры
         Vector3 forward = _cameraHolder.forward;
         Vector3 right = _cameraHolder.right;
         
-        // Убираем Y компонент для движения только в горизонтальной плоскости
         forward.y = 0f;
         right.y = 0f;
         forward.Normalize();
         right.Normalize();
         
-        _moveDirection = (forward * vertical + right * horizontal).normalized;
-        
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            ToggleRun();
-        }
-        
-        if (Input.GetKeyDown(KeyCode.LeftControl))
-        {
-            ToggleStealthMode();
-        }
-        
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            ToggleCursorLock();
-        }
+        _moveDirection = (forward * direction.y + right * direction.x).normalized;
     }
     
-    private void HandleMouseLook()
+    public void HandleMouseLook(float mouseX, float mouseY)
     {
-        float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity;
-        transform.Rotate(0, mouseX, 0);
+        transform.Rotate(0, mouseX * _mouseSensitivity, 0);
         
-        float mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity;
-        _verticalRotation -= mouseY;
+        _verticalRotation -= mouseY * _mouseSensitivity;
         _verticalRotation = Mathf.Clamp(_verticalRotation, -_maxLookAngle, _maxLookAngle);
         _cameraHolder.localRotation = Quaternion.Euler(_verticalRotation, 0, 0);
     }
@@ -228,20 +203,6 @@ public class PlayerMover : MonoBehaviour
         {
             _isRunning = false;
             RunChanged?.Invoke(_isRunning);
-        }
-    }
-    
-    private void ToggleCursorLock()
-    {
-        if (Cursor.lockState == CursorLockMode.Locked)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
         }
     }
     

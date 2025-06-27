@@ -89,22 +89,18 @@ public class CashierGalya : MonoBehaviour
         }
     }
     
-    public void DistractWithMoney()
+    public void Distract(Vector3 distractionPoint)
     {
-        if (!_isDistracted)
+        if (_isDistracted) return;
+
+        var stateMachine = GetComponent<EnemyStateMachine>();
+        if (stateMachine != null)
         {
-            StartDistraction("Подброшен рубль!");
-            PlaySound(_distractionSound);
+            stateMachine.SetPatrolDestination(distractionPoint);
         }
-    }
-    
-    public void DistractWithSale()
-    {
-        if (!_isDistracted)
-        {
-            StartDistraction("Акция на сгущёнку!");
-            PlaySound(_distractionSound);
-        }
+
+        StartDistraction("Что-то упало!");
+        PlaySound(_distractionSound);
     }
     
     private void StartDistraction(string message)
@@ -179,6 +175,26 @@ public class CashierGalya : MonoBehaviour
             _enemy.PlayerDetected -= OnPlayerDetected;
             _enemy.PlayerLost -= OnPlayerLost;
             _enemy.AlertedChanged -= OnAlertedChanged;
+        }
+    }
+    
+    [System.Obsolete("Используйте новый метод Distract(Vector3)")]
+    public void DistractWithMoney()
+    {
+        if (!_isDistracted)
+        {
+            StartDistraction("Подброшен рубль!");
+            PlaySound(_distractionSound);
+        }
+    }
+    
+    [System.Obsolete("Используйте новый метод Distract(Vector3)")]
+    public void DistractWithSale()
+    {
+        if (!_isDistracted)
+        {
+            StartDistraction("Акция на сгущёнку!");
+            PlaySound(_distractionSound);
         }
     }
 } 

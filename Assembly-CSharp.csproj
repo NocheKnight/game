@@ -59,7 +59,9 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Enemy\CashierGalya.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Customer.cs" />
      <Compile Include="Assets\Scripts\Enemy\Enemy.cs" />
+     <Compile Include="Assets\Scripts\Enemy\SecurityGuard.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\ChaseState.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\EnemyStateMachine.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\PatrolState.cs" />
@@ -69,16 +71,18 @@
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\PlayerLostTransition.cs" />
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerDistractions.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerInput.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerInteraction.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerInventory.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerMover.cs" />
      <Compile Include="Assets\Scripts\Police\PoliceCall.cs" />
      <Compile Include="Assets\Scripts\ScriptableObjects\Goods.cs" />
      <Compile Include="Assets\Scripts\Shop\CashRegister.cs" />
-     <Compile Include="Assets\Scripts\Shop\GoodsGenerator.cs" />
+     <Compile Include="Assets\Scripts\Shop\ItemSpawnPoint.cs" />
      <Compile Include="Assets\Scripts\Shop\Shelf.cs" />
-     <Compile Include="Assets\Scripts\Shop\ShelfItemInteraction.cs" />
-     <Compile Include="Assets\Scripts\Shop\ShelfItemVisual.cs" />
      <Compile Include="Assets\Scripts\Shop\SimpleItemPrefab.cs" />
+     <Compile Include="Assets\Scripts\Shop\StorableItem.cs" />
+     <None Include="Assets\FREE Food Pack\Shaders\Food.shader" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>

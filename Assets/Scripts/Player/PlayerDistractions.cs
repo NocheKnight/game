@@ -59,7 +59,6 @@ public class PlayerDistractions : MonoBehaviour
     private void Update()
     {
         UpdateCooldowns();
-        HandleInput();
     }
     
     private void UpdateCooldowns()
@@ -91,57 +90,20 @@ public class PlayerDistractions : MonoBehaviour
         }
     }
     
-    private void HandleInput()
-    {
-        // Подбросить рубль (клавиша E)
-        if (Input.GetKeyDown(KeyCode.E) && _canThrowMoney)
-        {
-            ThrowMoney();
-        }
-        
-        // Крикнуть про акцию (клавиша Q)
-        if (Input.GetKeyDown(KeyCode.Q) && _canShout)
-        {
-            ShoutAboutSale();
-        }
-    }
-    
     public void ThrowMoney()
     {
         if (!_canThrowMoney || _player.Money < _moneyThrowCost)
             return;
         
-        // Тратим деньги
         _player.SpendMoney(_moneyThrowCost);
         
-        // Находим врагов в радиусе
-        CashierGalya[] cashiers = FindObjectsOfType<CashierGalya>();
-        bool distractedAny = false;
-        
-        foreach (var cashier in cashiers)
-        {
-            float distance = Vector3.Distance(transform.position, cashier.transform.position);
-            if (distance <= _moneyThrowRange)
-            {
-                cashier.DistractWithMoney();
-                distractedAny = true;
-            }
-        }
-        
-        if (distractedAny)
-        {
-            // Создаем эффект подброшенных денег
-            CreateMoneyEffect();
-            PlaySound(_moneyThrowSound);
-            
-            Debug.Log("Подброшен рубль! Враги отвлечены.");
-        }
-        else
-        {
-            Debug.Log("Нет врагов в радиусе для отвлечения.");
-        }
-        
-        // Устанавливаем кулдаун
+        // Создаем "приманку" в точке перед игроком
+        Vector3 distractionPoint = transform.position + transform.forward * 2f;
+        CreateDistraction(distractionPoint, _moneyThrowRange);
+
+        PlaySound(_moneyThrowSound);
+        Debug.Log("Подброшен рубль!");
+
         _canThrowMoney = false;
         _moneyCooldownTimer = _distractionCooldown;
         MoneyThrown?.Invoke();
@@ -151,119 +113,54 @@ public class PlayerDistractions : MonoBehaviour
     {
         if (!_canShout)
             return;
-        
-        // Находим врагов в радиусе
-        CashierGalya[] cashiers = FindObjectsOfType<CashierGalya>();
-        bool distractedAny = false;
-        
-        foreach (var cashier in cashiers)
+
+        // Находим ближайшую полку к игроку (или можно выбрать любую по логике акции)
+        Shelf[] shelves = FindObjectsOfType<Shelf>();
+        Shelf nearest = null;
+        float minDist = float.MaxValue;
+        foreach (var shelf in shelves)
         {
-            float distance = Vector3.Distance(transform.position, cashier.transform.position);
-            if (distance <= _shoutRange)
+            float dist = Vector3.Distance(transform.position, shelf.transform.position);
+            if (dist < minDist)
             {
-                cashier.DistractWithSale();
-                distractedAny = true;
+                minDist = dist;
+                nearest = shelf;
             }
         }
-        
-        if (distractedAny)
+        if (nearest != null)
         {
-            // Создаем эффект крика
-            CreateShoutEffect();
-            PlaySound(_shoutSound);
-            
-            Debug.Log("Крик о акции! Враги отвлечены.");
+            // Смещение promoPoint на 1.5 метра от полки в сторону игрока
+            Vector3 dir = (transform.position - nearest.transform.position).normalized;
+            Vector3 promoPoint = nearest.transform.position + dir * 1.5f;
+            // (Опционально) Добавить небольшой разброс
+            promoPoint += new Vector3(Random.Range(-0.5f, 0.5f), 0, Random.Range(-0.5f, 0.5f));
+            Customer.AnnouncePromo(promoPoint, 6f);
         }
-        else
-        {
-            Debug.Log("Нет врагов в радиусе для отвлечения.");
-        }
+
+        CreateDistraction(transform.position, _shoutRange);
+        PlaySound(_shoutSound);
+        Debug.Log("Крик о акции!");
         
-        // Устанавливаем кулдаун
         _canShout = false;
         _shoutCooldownTimer = _distractionCooldown;
         ShoutUsed?.Invoke();
     }
     
-    private void CreateMoneyEffect()
+    private void CreateDistraction(Vector3 position, float radius)
     {
-        // Создаем простой эффект
-        GameObject effect = new GameObject("MoneyEffect");
-        effect.transform.position = transform.position + transform.forward * 2f;
+        GameObject distractionObject = new GameObject("DistractionZone");
+        distractionObject.transform.position = position;
         
-        // Добавляем простую анимацию
-        StartCoroutine(AnimateMoneyEffect(effect));
-    }
-    
-    private void CreateShoutEffect()
-    {
-        // Создаем простой эффект
-        GameObject effect = new GameObject("ShoutEffect");
-        effect.transform.position = transform.position + Vector3.up * 1.5f;
+        SphereCollider collider = distractionObject.AddComponent<SphereCollider>();
+        collider.isTrigger = true;
+        collider.radius = radius;
+
+        // Добавим скрипт, который будет оповещать врагов
+        DistractionZone zone = distractionObject.AddComponent<DistractionZone>();
+        zone.Initialize(radius);
         
-        // Добавляем простую анимацию
-        StartCoroutine(AnimateShoutEffect(effect));
-    }
-    
-    private IEnumerator AnimateMoneyEffect(GameObject effect)
-    {
-        // Простая анимация разлетающихся монет
-        for (int i = 0; i < 5; i++)
-        {
-            GameObject coin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            coin.transform.SetParent(effect.transform);
-            coin.transform.localScale = new Vector3(0.1f, 0.05f, 0.1f);
-            
-            Vector3 randomDirection = Random.insideUnitSphere;
-            randomDirection.y = Mathf.Abs(randomDirection.y); // Всегда вверх
-            
-            Rigidbody coinRb = coin.AddComponent<Rigidbody>();
-            coinRb.AddForce(randomDirection * 3f, ForceMode.Impulse);
-            
-            // Удаляем монету через 2 секунды
-            Destroy(coin, 2f);
-            
-            yield return new WaitForSeconds(0.1f);
-        }
-        
-        // Удаляем эффект через 3 секунды
-        Destroy(effect, 3f);
-    }
-    
-    private IEnumerator AnimateShoutEffect(GameObject effect)
-    {
-        // Простая анимация звуковой волны
-        for (int i = 0; i < 3; i++)
-        {
-            GameObject wave = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            wave.transform.SetParent(effect.transform);
-            wave.transform.localScale = Vector3.one * (i + 1) * 0.5f;
-            
-            Material waveMaterial = new Material(Shader.Find("Standard"));
-            waveMaterial.color = new Color(1f, 1f, 1f, 0.3f);
-            wave.GetComponent<Renderer>().material = waveMaterial;
-            
-            // Анимация расширения
-            float duration = 1f;
-            float elapsed = 0f;
-            Vector3 startScale = wave.transform.localScale;
-            
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float progress = elapsed / duration;
-                
-                wave.transform.localScale = startScale * (1f + progress);
-                waveMaterial.color = new Color(1f, 1f, 1f, 0.3f * (1f - progress));
-                
-                yield return null;
-            }
-            
-            Destroy(wave);
-        }
-        
-        // Удаляем эффект
-        Destroy(effect, 1f);
+        // Уничтожаем объект через пару секунд
+        Destroy(distractionObject, 2f);
     }
     
     private void PlaySound(AudioClip clip)
@@ -300,6 +197,28 @@ public class PlayerDistractions : MonoBehaviour
         if (_player != null)
         {
             _player.MoneyChanged -= OnMoneyChanged;
+        }
+    }
+}
+
+/// <summary>
+/// Простой компонент для зоны отвлечения, который ищет врагов при создании.
+/// В будущем можно сделать его более сложным (например, чтобы враги реагировали на вход в триггер).
+/// </summary>
+public class DistractionZone : MonoBehaviour
+{
+    public void Initialize(float radius)
+    {
+        // Вместо FindObjectsOfType, мы делаем один OverlapSphere, что намного эффективнее.
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
+        foreach (var hitCollider in hitColliders)
+        {
+            // Пытаемся получить компонент врага. В будущем здесь может быть общий интерфейс IDistractable
+            if (hitCollider.TryGetComponent<CashierGalya>(out var cashier))
+            {
+                // Говорим врагу, куда идти
+                cashier.Distract(transform.position); 
+            }
         }
     }
 } 

@@ -131,8 +131,23 @@ public class Enemy : MonoBehaviour
     {
         Vector3 directionToPlayer = (_target.transform.position - transform.position).normalized;
         float angle = Vector3.Angle(transform.forward, directionToPlayer);
-        
-        return angle <= _fieldOfView * 0.5f;
+        if (angle > _fieldOfView * 0.5f)
+            return false;
+
+        // --- Проверка на толпу покупателей ---
+        float distance = Vector3.Distance(transform.position, _target.transform.position);
+        Ray ray = new Ray(transform.position + Vector3.up * 1.5f, directionToPlayer); // немного выше, чтобы не цеплять пол
+        RaycastHit[] hits = Physics.RaycastAll(ray, distance);
+        foreach (var hit in hits)
+        {
+            var customer = hit.collider.GetComponent<Customer>();
+            if (customer != null && customer.IsBlockingVision)
+            {
+                // Между врагом и игроком есть покупатель, который мешает обзору
+                return false;
+            }
+        }
+        return true;
     }
     
     private float CalculateDetectionChance()
