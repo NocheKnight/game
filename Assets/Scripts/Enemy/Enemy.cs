@@ -15,12 +15,14 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float _noiseDetectionMultiplier = 1.5f;
     [SerializeField] private float _suspicionThreshold = 0.8f;
     
+    [Header("Система подозрений")]
+    [SerializeField] private float _suspicionGrowthSpeed = 0.2f;
+    [SerializeField] private float _suspicionDecaySpeed = 0.1f;
+    [SerializeField] private float _suspicionLevel = 0f;
+    [SerializeField] private bool _isSuspicious = false;
+    
     [Header("Состояние")]
     [SerializeField] private bool _isAlerted = false;
-    [SerializeField] private bool _isSuspicious = false;
-    [SerializeField] private float _suspicionLevel = 0f;
-    
-    [Header("Цели")]
     [SerializeField] private Player _target;
     [SerializeField] private Transform _lastKnownPosition;
     
@@ -43,7 +45,6 @@ public class Enemy : MonoBehaviour
     private PlayerMover _playerMover;
     private Vector3 _startPosition;
     private float _alertTimer = 0f;
-    private float _suspicionDecayRate = 0.5f; // Скорость снижения подозрений
     
     private void Awake()
     {
@@ -75,55 +76,31 @@ public class Enemy : MonoBehaviour
         if (_target == null) return;
         
         CheckForPlayer();
-        UpdateSuspicion();
         UpdateAlertTimer();
+        UpdateSuspicionDecay();
     }
     
     private void CheckForPlayer()
     {
+        if (_target == null) return;
+
         float distanceToPlayer = Vector3.Distance(transform.position, _target.transform.position);
         
-        // Проверяем дальность обнаружения
         if (distanceToPlayer <= _detectionRange)
         {
-            // Проверяем поле зрения
             if (IsPlayerInFieldOfView())
             {
-                float detectionChance = CalculateDetectionChance();
-                
-                if (detectionChance >= _suspicionThreshold)
-                {
-                    DetectPlayer();
-                }
-                else
-                {
-                    IncreaseSuspicion(detectionChance);
-                }
+                OnPlayerSeen();
             }
             
-            // Проверяем слух (шум от игрока)
             if (_playerMover != null)
             {
-                float noiseLevel = _playerMover.NoiseLevel;
-                float hearingChance = CalculateHearingChance(distanceToPlayer, noiseLevel);
-                
-                if (hearingChance >= _suspicionThreshold)
-                {
-                    DetectPlayer();
-                }
-                else if (hearingChance > 0.3f)
-                {
-                    IncreaseSuspicion(hearingChance * 0.5f);
-                }
+                OnPlayerHeard(distanceToPlayer, _playerMover.NoiseLevel);
             }
         }
         else
         {
-            // Игрок вне зоны обнаружения
-            if (_isAlerted)
-            {
-                LosePlayer();
-            }
+            OnPlayerOutOfRange();
         }
     }
     
@@ -150,7 +127,7 @@ public class Enemy : MonoBehaviour
         return true;
     }
     
-    private float CalculateDetectionChance()
+    protected float CalculateDetectionChance()
     {
         float baseChance = 1f;
         float distance = Vector3.Distance(transform.position, _target.transform.position);
@@ -175,7 +152,7 @@ public class Enemy : MonoBehaviour
         return Mathf.Clamp01(baseChance);
     }
     
-    private float CalculateHearingChance(float distance, float noiseLevel)
+    protected float CalculateHearingChance(float distance, float noiseLevel)
     {
         if (distance > _hearingRange) return 0f;
         
@@ -185,7 +162,53 @@ public class Enemy : MonoBehaviour
         return Mathf.Clamp01(baseChance * distanceMultiplier);
     }
     
-    private void DetectPlayer()
+    public void AddSuspicion(float amount)
+    {
+        float oldSuspicion = _suspicionLevel;
+        _suspicionLevel = Mathf.Clamp01(_suspicionLevel + amount);
+        
+        // Проверяем, нужно ли изменить состояние подозрительности
+        bool wasSuspicious = _isSuspicious;
+        _isSuspicious = _suspicionLevel > 0.1f;
+        
+        if (_isSuspicious != wasSuspicious)
+        {
+            SuspiciousChanged?.Invoke(_isSuspicious);
+        }
+        
+        // Проверяем, нужно ли перейти в состояние тревоги
+        if (_suspicionLevel >= _suspicionThreshold && !_isAlerted)
+        {
+            DetectPlayer();
+        }
+        
+        if (oldSuspicion != _suspicionLevel)
+        {
+            SuspicionLevelChanged?.Invoke(_suspicionLevel);
+        }
+    }
+    
+    public void ReduceSuspicion(float amount)
+    {
+        float oldSuspicion = _suspicionLevel;
+        _suspicionLevel = Mathf.Max(0f, _suspicionLevel - amount);
+        
+        // Проверяем, нужно ли изменить состояние подозрительности
+        bool wasSuspicious = _isSuspicious;
+        _isSuspicious = _suspicionLevel > 0.1f;
+        
+        if (_isSuspicious != wasSuspicious)
+        {
+            SuspiciousChanged?.Invoke(_isSuspicious);
+        }
+        
+        if (oldSuspicion != _suspicionLevel)
+        {
+            SuspicionLevelChanged?.Invoke(_suspicionLevel);
+        }
+    }
+    
+    protected void DetectPlayer()
     {
         if (!_isAlerted)
         {
@@ -217,38 +240,6 @@ public class Enemy : MonoBehaviour
         }
     }
     
-    private void IncreaseSuspicion(float amount)
-    {
-        if (!_isAlerted)
-        {
-            _suspicionLevel = Mathf.Clamp01(_suspicionLevel + amount);
-            
-            if (_suspicionLevel >= _suspicionThreshold && !_isSuspicious)
-            {
-                _isSuspicious = true;
-                SuspiciousChanged?.Invoke(_isSuspicious);
-            }
-            
-            SuspicionLevelChanged?.Invoke(_suspicionLevel);
-        }
-    }
-    
-    private void UpdateSuspicion()
-    {
-        if (!_isAlerted && _suspicionLevel > 0f)
-        {
-            _suspicionLevel = Mathf.Max(0f, _suspicionLevel - _suspicionDecayRate * Time.deltaTime);
-            
-            if (_suspicionLevel < _suspicionThreshold && _isSuspicious)
-            {
-                _isSuspicious = false;
-                SuspiciousChanged?.Invoke(_isSuspicious);
-            }
-            
-            SuspicionLevelChanged?.Invoke(_suspicionLevel);
-        }
-    }
-    
     private void UpdateAlertTimer()
     {
         if (_isAlerted && _alertTimer > 0f)
@@ -262,10 +253,19 @@ public class Enemy : MonoBehaviour
         }
     }
     
+    private void UpdateSuspicionDecay()
+    {
+        // Подозрения спадают со временем, если игрок не в зоне видимости
+        if (_suspicionLevel > 0f && !_isAlerted)
+        {
+            ReduceSuspicion(_suspicionDecaySpeed * Time.deltaTime);
+        }
+    }
+    
     public void TakeDamage(int damage)
     {
         _health -= damage;
-
+        
         if (_health <= 0)
         {
             Die();
@@ -275,9 +275,9 @@ public class Enemy : MonoBehaviour
     public void SetTarget(Player target)
     {
         _target = target;
-        if (target != null)
+        if (_target != null)
         {
-            _playerMover = target.GetComponent<PlayerMover>();
+            _playerMover = _target.GetComponent<PlayerMover>();
         }
     }
     
@@ -288,6 +288,11 @@ public class Enemy : MonoBehaviour
         _isSuspicious = false;
         _suspicionLevel = 0f;
         _alertTimer = 0f;
+        
+        if (_stateMachine != null)
+        {
+            _stateMachine.ResetToFirstState();
+        }
         
         AlertedChanged?.Invoke(_isAlerted);
         SuspiciousChanged?.Invoke(_isSuspicious);
@@ -300,26 +305,86 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
     
-    // Методы для отладки
     private void OnDrawGizmosSelected()
     {
-        // Поле зрения
-        Gizmos.color = Color.yellow;
+        // Зона обнаружения
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, _detectionRange);
         
-        // Поле слуха
+        // Зона слуха
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, _hearingRange);
         
-        // Направление взгляда
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, transform.forward * 3f);
+        // Поле зрения
+        Gizmos.color = Color.yellow;
+        Vector3 forward = transform.forward;
+        Vector3 left = Quaternion.Euler(0, -_fieldOfView * 0.5f, 0) * forward;
+        Vector3 right = Quaternion.Euler(0, _fieldOfView * 0.5f, 0) * forward;
         
-        // Последняя известная позиция игрока
+        Gizmos.DrawRay(transform.position + Vector3.up * 1.5f, left * _detectionRange);
+        Gizmos.DrawRay(transform.position + Vector3.up * 1.5f, right * _detectionRange);
+        
+        // Последняя известная позиция
         if (_lastKnownPosition != null)
         {
             Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(_lastKnownPosition.position, 0.5f);
         }
+    }
+    
+    protected virtual void OnPlayerSeen() 
+    { 
+        // Базовый метод - можно переопределить в наследниках
+        float detectionChance = CalculateDetectionChance();
+        if (UnityEngine.Random.value <= detectionChance)
+        {
+            AddSuspicion(_suspicionGrowthSpeed * Time.deltaTime);
+        }
+    }
+    
+    protected virtual void OnPlayerHeard(float distance, float noiseLevel) 
+    { 
+        // Базовый метод - можно переопределить в наследниках
+        float hearingChance = CalculateHearingChance(distance, noiseLevel);
+        if (UnityEngine.Random.value <= hearingChance)
+        {
+            AddSuspicion(_suspicionGrowthSpeed * 0.5f * Time.deltaTime);
+        }
+    }
+    
+    protected virtual void OnPlayerOutOfRange() 
+    { 
+        // Базовый метод - можно переопределить в наследниках
+        // Подозрения спадают автоматически в UpdateSuspicionDecay()
+    }
+    
+    public void SetDetectionRange(float newRange)
+    {
+        _detectionRange = newRange;
+    }
+    
+    public void SetFieldOfView(float newFieldOfView)
+    {
+        _fieldOfView = newFieldOfView;
+    }
+    
+    public void SetHearingRange(float newHearingRange)
+    {
+        _hearingRange = newHearingRange;
+    }
+    
+    public void SetSuspicionThreshold(float newThreshold)
+    {
+        _suspicionThreshold = newThreshold;
+    }
+    
+    public void SetSuspicionGrowthSpeed(float newSpeed)
+    {
+        _suspicionGrowthSpeed = newSpeed;
+    }
+    
+    public void SetSuspicionDecaySpeed(float newSpeed)
+    {
+        _suspicionDecaySpeed = newSpeed;
     }
 }
