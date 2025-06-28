@@ -8,7 +8,6 @@ public class Upgrades : MonoBehaviour
 
     void Awake() {
         _player = GetComponent<Player>();
-        _player.AddMoney(1000);
     }
 
     void Start() {

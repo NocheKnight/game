@@ -11,12 +11,12 @@ public class Player : MonoBehaviour
     [SerializeField] private int _maxInventoryWeight = 10;
     
     [Header("Навыки воровства")]
-    [SerializeField] private int _stealthLevel = 1;
-    [SerializeField] private int _pickpocketLevel = 1;
-    [SerializeField] private int _distractionLevel = 1;
+    [SerializeField] private static int _stealthLevel = 1;
+    [SerializeField] private static int _pickpocketLevel = 1;
+    [SerializeField] private static int _distractionLevel = 1;
     
     [Header("Экономика")]
-    [SerializeField] private int _money = 0;
+    [SerializeField] private static int _money = 1000;
     [SerializeField] private int _fine = 0;
     
     private int _crimeRate;
