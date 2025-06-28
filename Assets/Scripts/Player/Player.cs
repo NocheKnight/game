@@ -31,6 +31,8 @@ public class Player : MonoBehaviour
     public int DistractionLevel => _distractionLevel;
     public int MaxInventoryWeight => _maxInventoryWeight;
     
+    public bool IsStealing { get; private set; }
+    
     public event UnityAction<int> MoneyChanged;
     public event UnityAction<int> FineChanged;
     public event UnityAction<int> CrimeRateChanged;
@@ -198,5 +200,16 @@ public class Player : MonoBehaviour
     {
         PlayerDied?.Invoke();
         Destroy(gameObject);
+    }
+
+    public void TrySteal()
+    {
+        IsStealing = true;
+        Invoke(nameof(ResetStealing), 0.5f); // сброс через 0.5 сек
+    }
+
+    private void ResetStealing()
+    {
+        IsStealing = false;
     }
 }

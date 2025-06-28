@@ -37,7 +37,7 @@ public class PlayerMover : MonoBehaviour
     
     public bool IsOverloaded => _isOverloaded;
     public bool IsRunning => _isRunning;
-    public bool IsStealthMode => _isStealthMode;
+    public bool IsStealthMode { get; private set; }
     public float CurrentSpeed => _currentSpeed;
     public float NoiseLevel => _noiseLevel;
     
@@ -79,6 +79,7 @@ public class PlayerMover : MonoBehaviour
     
     private void Update()
     {
+        IsStealthMode = Input.GetKey(KeyCode.LeftControl); // или другую кнопку по желанию
         UpdateSpeed();
         UpdateNoiseLevel();
     }

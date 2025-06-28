@@ -59,20 +59,10 @@ public class CashierGalya : MonoBehaviour
         if (_enemy != null)
         {
             // Увеличиваем дальность обнаружения
-            var detectionRangeField = typeof(Enemy).GetField("_detectionRange", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (detectionRangeField != null)
-            {
-                detectionRangeField.SetValue(_enemy, _xrayVisionRange);
-            }
+            _enemy.SetDetectionRange(_xrayVisionRange);
             
             // Увеличиваем поле зрения
-            var fieldOfViewField = typeof(Enemy).GetField("_fieldOfView", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (fieldOfViewField != null)
-            {
-                fieldOfViewField.SetValue(_enemy, 120f); // Широкое поле зрения
-            }
+            _enemy.SetFieldOfView(120f); // Широкое поле зрения
         }
     }
     
@@ -113,12 +103,7 @@ public class CashierGalya : MonoBehaviour
         // Временно снижаем бдительность
         if (_enemy != null)
         {
-            var suspicionField = typeof(Enemy).GetField("_suspicionLevel", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (suspicionField != null)
-            {
-                suspicionField.SetValue(_enemy, 0f);
-            }
+            _enemy.ReduceSuspicion(1f); // Полностью сбрасываем подозрения
         }
     }
     
