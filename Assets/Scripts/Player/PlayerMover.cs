@@ -67,9 +67,6 @@ public class PlayerMover : MonoBehaviour
             mainCamera.transform.localPosition = Vector3.zero;
             mainCamera.transform.localRotation = Quaternion.identity;
         }
-        
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
     }
     
     private void Start()
