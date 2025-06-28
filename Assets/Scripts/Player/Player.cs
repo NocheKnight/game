@@ -191,6 +191,10 @@ public class Player : MonoBehaviour
         {
             policeCall.Call(_crimeRate);
         }
+        else
+        {
+            Debug.LogWarning("PoliceCall не найден в сцене! Создайте объект с компонентом PoliceCall.");
+        }
         
         _crimeRate = 0;
         CrimeRateChanged?.Invoke(_crimeRate);

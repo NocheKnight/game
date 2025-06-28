@@ -98,8 +98,6 @@ public class CashierGalya : MonoBehaviour
         _isDistracted = true;
         _distractionTimer = _distractionDuration * _distractionResistance;
         
-        Debug.Log($"Кассирша Валентина отвлечена: {message}");
-        
         // Временно снижаем бдительность
         if (_enemy != null)
         {
@@ -111,18 +109,16 @@ public class CashierGalya : MonoBehaviour
     {
         _isDistracted = false;
         _distractionTimer = 0f;
-        Debug.Log("Кассирша Галя снова бдительна!");
     }
     
     private void OnPlayerDetected(Player player)
     {
         PlaySound(_detectionSound);
-        Debug.Log("Кассирша Галя видит сквозь одежду! Игрок обнаружен!");
     }
     
     private void OnPlayerLost()
     {
-        Debug.Log("Кассирша Галя потеряла игрока из виду");
+        // Кассирша потеряла игрока
     }
     
     private void OnAlertedChanged(bool isAlerted)
