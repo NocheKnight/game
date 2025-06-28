@@ -124,7 +124,7 @@ public class Player : MonoBehaviour
     
     public bool TryUpgradeStealth()
     {
-        int cost = _stealthLevel * 100;
+        int cost = GetStealthUpdateCost();
         if (SpendMoney(cost))
         {
             _stealthLevel++;
@@ -134,10 +134,14 @@ public class Player : MonoBehaviour
         }
         return false;
     }
+
+    public int GetStealthUpdateCost() {
+        return _stealthLevel * 100;
+    }
     
     public bool TryUpgradePickpocket()
     {
-        int cost = _pickpocketLevel * 150;
+        int cost = GetPickpocketUpdateCost();
         if (SpendMoney(cost))
         {
             _pickpocketLevel++;
@@ -146,10 +150,14 @@ public class Player : MonoBehaviour
         }
         return false;
     }
+
+    public int GetPickpocketUpdateCost() {
+        return _pickpocketLevel * 150;
+    }
     
     public bool TryUpgradeDistraction()
     {
-        int cost = _distractionLevel * 120;
+        int cost = GetDistractionUpdateCost();
         if (SpendMoney(cost))
         {
             _distractionLevel++;
@@ -157,6 +165,10 @@ public class Player : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public int GetDistractionUpdateCost() {
+        return _distractionLevel * 120;;
     }
     
     // Методы для стелс-механик
