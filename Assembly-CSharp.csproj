@@ -61,7 +61,9 @@
      <Compile Include="Assets\Scripts\Enemy\CashierGalya.cs" />
      <Compile Include="Assets\Scripts\Enemy\Customer.cs" />
      <Compile Include="Assets\Scripts\Enemy\Enemy.cs" />
+     <Compile Include="Assets\Scripts\Enemy\EnemyAnimator.cs" />
      <Compile Include="Assets\Scripts\Enemy\SecurityGuard.cs" />
+     <Compile Include="Assets\Scripts\Enemy\SimpleEnemyAnimator.cs" />
      <Compile Include="Assets\Scripts\Enemy\SimpleSuspicionIndicator.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\ChaseState.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\EnemyStateMachine.cs" />
@@ -71,11 +73,14 @@
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transition.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\PlayerDetectedTransition.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\PlayerLostTransition.cs" />
+     <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\ReturnToPatrolTransition.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\SuspicionClearedTransition.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\SuspiciousTransition.cs" />
      <Compile Include="Assets\Scripts\Enemy\SuspicionIndicator.cs" />
      <Compile Include="Assets\Scripts\Enemy\WorldSpaceSuspicionIndicator.cs" />
+     <Compile Include="Assets\Scripts\ExitTrigger.cs" />
      <Compile Include="Assets\Scripts\Player\Player.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerAnimator.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerDistractions.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerInput.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerInteraction.cs" />
@@ -88,6 +93,13 @@
      <Compile Include="Assets\Scripts\Shop\Shelf.cs" />
      <Compile Include="Assets\Scripts\Shop\SimpleItemPrefab.cs" />
      <Compile Include="Assets\Scripts\Shop\StorableItem.cs" />
+     <Compile Include="Assets\Scripts\UI\ButtonTester.cs" />
+     <Compile Include="Assets\Scripts\UI\GameOverUI.cs" />
+     <Compile Include="Assets\Scripts\UI\GameUITester.cs" />
+     <Compile Include="Assets\Scripts\UI\PlayerStatsUI.cs" />
+     <Compile Include="Assets\Scripts\UI\SimpleGameUI.cs" />
+     <Compile Include="Assets\Scripts\UI\SimplePlayerStatsUI.cs" />
+     <Compile Include="Assets\Scripts\UI\WinUI.cs" />
      <None Include="Assets\FREE Food Pack\Shaders\Food.shader" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

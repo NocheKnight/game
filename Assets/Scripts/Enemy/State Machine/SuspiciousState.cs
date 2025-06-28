@@ -38,8 +38,6 @@ public class SuspiciousState : State
         _isLookingAround = false;
         _lookTimer = 0f;
         _lookDirection = 0;
-        
-        Debug.Log($"{gameObject.name} стал подозрительным в позиции {_suspiciousPosition}");
     }
     
     private void Update()
@@ -96,7 +94,10 @@ public class SuspiciousState : State
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
             }
             
-            transform.position += direction * _investigationSpeed * Time.deltaTime;
+            // Двигаемся только по X и Z, сохраняя Y позицию
+            Vector3 movement = direction * _investigationSpeed * Time.deltaTime;
+            movement.y = 0;
+            transform.position += movement;
         }
         else
         {

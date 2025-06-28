@@ -24,26 +24,38 @@ public class PlayerMover : MonoBehaviour
     [SerializeField] private Transform _cameraHolder;
     [SerializeField] private float _maxLookAngle = 80f;
     
+    [Header("Настройки приседания")]
+    [SerializeField] private float _standingHeight = 1.8f;
+    [SerializeField] private float _crouchingHeight = 0.9f;
+    [SerializeField] private float _crouchSpeed = 5f;
+    [SerializeField] private float _crouchSpeedMultiplier = 0.6f;
+    
     private float _currentSpeed;
     private bool _isOverloaded = false;
     private bool _isRunning = false;
     private bool _isStealthMode = false;
+    private bool _isCrouching = false;
     
     private Player _player;
     private PlayerInventory _inventory;
     private Rigidbody _rigidbody;
+    private CapsuleCollider _collider;
     private Vector3 _moveDirection;
     private float _verticalRotation = 0f;
+    private float _targetHeight;
+    private float _currentHeight;
     
     public bool IsOverloaded => _isOverloaded;
     public bool IsRunning => _isRunning;
     public bool IsStealthMode { get; private set; }
+    public bool IsCrouching => _isCrouching;
     public float CurrentSpeed => _currentSpeed;
     public float NoiseLevel => _noiseLevel;
     
     public event UnityAction<bool> OverloadChanged;
     public event UnityAction<bool> RunChanged;
     public event UnityAction<bool> StealthModeChanged;
+    public event UnityAction<bool> CrouchChanged;
     public event UnityAction<float> SpeedChanged;
     
     private void Awake()
@@ -51,6 +63,7 @@ public class PlayerMover : MonoBehaviour
         _player = GetComponent<Player>();
         _inventory = GetComponent<PlayerInventory>();
         _rigidbody = GetComponent<Rigidbody>();
+        _collider = GetComponent<CapsuleCollider>();
         
         if (_cameraHolder == null)
         {
@@ -67,6 +80,10 @@ public class PlayerMover : MonoBehaviour
             mainCamera.transform.localPosition = Vector3.zero;
             mainCamera.transform.localRotation = Quaternion.identity;
         }
+        
+        // Инициализация высоты
+        _targetHeight = _standingHeight;
+        _currentHeight = _standingHeight;
     }
     
     private void Start()
@@ -76,7 +93,9 @@ public class PlayerMover : MonoBehaviour
     
     private void Update()
     {
-        IsStealthMode = Input.GetKey(KeyCode.LeftControl); // или другую кнопку по желанию
+        HandleCrouchInput();
+        IsStealthMode = Input.GetKey(KeyCode.LeftControl);
+        UpdateCrouch();
         UpdateSpeed();
         UpdateNoiseLevel();
     }
@@ -84,6 +103,38 @@ public class PlayerMover : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
+    }
+    
+    private void HandleCrouchInput()
+    {
+        bool shouldCrouch = Input.GetKey(KeyCode.LeftControl);
+        
+        if (shouldCrouch != _isCrouching)
+        {
+            _isCrouching = shouldCrouch;
+            _targetHeight = _isCrouching ? _crouchingHeight : _standingHeight;
+            CrouchChanged?.Invoke(_isCrouching);
+        }
+    }
+    
+    private void UpdateCrouch()
+    {
+        // Плавно изменяем высоту
+        _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, _crouchSpeed * Time.deltaTime);
+        
+        // Обновляем коллайдер
+        if (_collider != null)
+        {
+            _collider.height = _currentHeight;
+            _collider.center = new Vector3(0, _currentHeight * 0.5f, 0);
+        }
+        
+        // Обновляем позицию камеры
+        if (_cameraHolder != null)
+        {
+            float cameraHeight = _currentHeight * 0.9f; // Камера чуть ниже полной высоты
+            _cameraHolder.localPosition = new Vector3(0, cameraHeight, 0);
+        }
     }
     
     public void SetMoveDirection(Vector2 direction)
@@ -125,11 +176,11 @@ public class PlayerMover : MonoBehaviour
     {
         float baseSpeed = _walkSpeed;
         
-        if (_isRunning && !_isStealthMode)
+        if (_isRunning && !_isStealthMode && !_isCrouching)
         {
             baseSpeed = _runSpeed;
         }
-        else if (_isStealthMode)
+        else if (_isStealthMode || _isCrouching)
         {
             baseSpeed = _stealthSpeed;
         }
@@ -139,6 +190,11 @@ public class PlayerMover : MonoBehaviour
         if (_isOverloaded)
         {
             speedMultiplier *= _overloadSpeedMultiplier;
+        }
+        
+        if (_isCrouching)
+        {
+            speedMultiplier *= _crouchSpeedMultiplier;
         }
         
         if (_player != null)
@@ -154,12 +210,12 @@ public class PlayerMover : MonoBehaviour
     {
         float baseNoise = 1f;
         
-        if (_isRunning)
+        if (_isRunning && !_isCrouching)
         {
             baseNoise = 2f;
         }
         
-        if (_isStealthMode)
+        if (_isStealthMode || _isCrouching)
         {
             baseNoise *= 0.3f;
         }
@@ -184,7 +240,7 @@ public class PlayerMover : MonoBehaviour
     
     public void ToggleRun()
     {
-        if (!_isStealthMode) // Нельзя бежать в стелс-режиме
+        if (!_isStealthMode && !_isCrouching) // Нельзя бежать в стелс-режиме или приседая
         {
             _isRunning = !_isRunning;
             RunChanged?.Invoke(_isRunning);

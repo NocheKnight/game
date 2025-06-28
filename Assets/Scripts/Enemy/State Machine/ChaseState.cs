@@ -29,8 +29,6 @@ public class ChaseState : State
         {
             _lastKnownPosition = Target.transform.position;
         }
-        
-        Debug.Log($"{gameObject.name} начал преследование игрока!");
     }
     
     private void Update()
@@ -50,7 +48,6 @@ public class ChaseState : State
         // Проверяем таймаут погони
         if (_chaseTimer >= _chaseTimeout)
         {
-            Debug.Log($"{gameObject.name} потерял игрока по таймауту!");
             _enemy.ReduceSuspicion(0.3f); // Снижаем подозрения
             return;
         }
@@ -58,7 +55,6 @@ public class ChaseState : State
         // Если игрок потерян и мы достигли последней позиции, переходим в подозрительное состояние
         if (!_enemy.IsAlerted && _hasReachedLastPosition)
         {
-            Debug.Log($"{gameObject.name} достиг последней позиции игрока!");
             return;
         }
         
@@ -74,8 +70,16 @@ public class ChaseState : State
             targetPosition = Target.transform.position;
             
             float distanceToPlayer = Vector3.Distance(transform.position, Target.transform.position);
+            
+            // Отладочная информация о расстоянии
+            if (distanceToPlayer <= _catchDistance + 1f) // Показываем когда близко
+            {
+                Debug.Log($"Расстояние до игрока: {distanceToPlayer:F2}, порог поимки: {_catchDistance}");
+            }
+            
             if (distanceToPlayer <= _catchDistance)
             {
+                Debug.Log($"Условие поимки выполнено! Расстояние: {distanceToPlayer:F2}");
                 CatchPlayer();
                 return;
             }
@@ -89,11 +93,14 @@ public class ChaseState : State
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
         }
         
-        // Двигаемся к цели на высокой скорости
+        // Двигаемся к цели на высокой скорости, но с ограничением по Y
         float distance = Vector3.Distance(transform.position, targetPosition);
         if (distance > 0.5f)
         {
-            transform.position += direction * _chaseSpeed * Time.deltaTime;
+            Vector3 movement = direction * _chaseSpeed * Time.deltaTime;
+            // Сохраняем текущую Y позицию, чтобы избежать взлёта
+            movement.y = 0;
+            transform.position += movement;
         }
         else
         {
@@ -104,17 +111,51 @@ public class ChaseState : State
     
     private void CatchPlayer()
     {
+        Debug.Log("CatchPlayer вызван! Охранник ловит игрока.");
+        
         if (Target != null)
         {
+            Debug.Log($"Игрок пойман: {Target.name}");
+            
             // Игрок пойман - добавляем штраф
             Target.AddFine(1000);
             Target.AddCrimeRate(100);
             
-            Debug.Log("Игрок пойман! Штраф: 1000₽");
+            // Показываем Game Over
+            ShowGameOver();
             
             // Сбрасываем состояние врага
             _enemy.ResetToStartPosition();
         }
+        else
+        {
+            Debug.LogWarning("Target равен null в CatchPlayer!");
+        }
+    }
+    
+    private void ShowGameOver()
+    {
+        // Сначала ищем SimpleGameUI (упрощённая версия)
+        var simpleGameUI = FindObjectOfType<SimpleGameUI>();
+        if (simpleGameUI != null)
+        {
+            simpleGameUI.ShowCaughtByGuard();
+            return;
+        }
+        
+        // Если не найден, ищем GameOverUI (полная версия)
+        var gameOverUI = FindObjectOfType<GameOverUI>();
+        if (gameOverUI != null)
+        {
+            gameOverUI.ShowCaughtByGuard();
+            return;
+        }
+        
+        // Если ничего не найдено, выводим предупреждение
+        Debug.LogWarning("GameOverUI или SimpleGameUI не найден! Создайте один из них в сцене.");
+        
+        // Альтернативно, можно показать простой Game Over через Debug
+        Debug.Log("GAME OVER: Охранник догнал вас!");
     }
     
     // Методы для отладки
