@@ -81,9 +81,6 @@ public class PlayerMover : MonoBehaviour
             mainCamera.transform.localRotation = Quaternion.identity;
         }
         
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        
         // Инициализация высоты
         _targetHeight = _standingHeight;
         _currentHeight = _standingHeight;
@@ -167,11 +164,11 @@ public class PlayerMover : MonoBehaviour
         if (_moveDirection.magnitude > 0.1f)
         {
             Vector3 velocity = _moveDirection * _currentSpeed;
-            _rigidbody.velocity = new Vector3(velocity.x, _rigidbody.velocity.y, velocity.z);
+            _rigidbody.linearVelocity = new Vector3(velocity.x, _rigidbody.linearVelocity.y, velocity.z);
         }
         else
         {
-            _rigidbody.velocity = new Vector3(0f, _rigidbody.velocity.y, 0f);
+            _rigidbody.linearVelocity = new Vector3(0f, _rigidbody.linearVelocity.y, 0f);
         }
     }
     
@@ -266,7 +263,7 @@ public class PlayerMover : MonoBehaviour
     public void ForceStop()
     {
         _moveDirection = Vector3.zero;
-        _rigidbody.velocity = new Vector3(0f, _rigidbody.velocity.y, 0f);
+        _rigidbody.linearVelocity = new Vector3(0f, _rigidbody.linearVelocity.y, 0f);
     }
     
     public bool IsMoving()
