@@ -44,13 +44,11 @@ public class SuspiciousState : State
     {
         if (_enemy == null) return;
         
-        // Если игрок обнаружен, сразу переходим в преследование
         if (_enemy.IsAlerted)
         {
             return;
         }
         
-        // Если подозрения исчезли, возвращаемся к патрулированию
         if (!_enemy.IsSuspicious)
         {
             return;
@@ -60,7 +58,6 @@ public class SuspiciousState : State
         
         if (_investigationTimer <= 0f)
         {
-            // Время расследования истекло, возвращаемся к патрулированию
             _enemy.ReduceSuspicion(0.5f);
             return;
         }
@@ -87,21 +84,18 @@ public class SuspiciousState : State
         
         if (distance > 1f)
         {
-            // Двигаемся к подозрительной позиции медленно и осторожно
             if (direction != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
             }
             
-            // Двигаемся только по X и Z, сохраняя Y позицию
             Vector3 movement = direction * _investigationSpeed * Time.deltaTime;
             movement.y = 0;
             transform.position += movement;
         }
         else
         {
-            // Достигли позиции, начинаем осматриваться
             _isLookingAround = true;
             _lookTimer = 0f;
         }
@@ -117,7 +111,6 @@ public class SuspiciousState : State
             _lookTimer = 0f;
         }
         
-        // Поворачиваемся в разные стороны
         Vector3 lookDirection = Vector3.zero;
         switch (_lookDirection)
         {
@@ -134,7 +127,6 @@ public class SuspiciousState : State
         }
     }
     
-    // Методы для отладки
     private void OnDrawGizmosSelected()
     {
         if (_enemy != null)

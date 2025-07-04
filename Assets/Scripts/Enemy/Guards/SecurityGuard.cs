@@ -11,35 +11,11 @@ public class SecurityGuard : Enemy
     [SerializeField] private float _stealthSuspicionMultiplier = 2.0f;
     [SerializeField] private float _theftSuspicionMultiplier = 5.0f;
 
-    private void Start()
-    {
-        // Проверяем стейт-машину
-        var stateMachine = GetComponent<EnemyStateMachine>();
-        if (stateMachine != null)
-        {
-            // First State: {stateMachine.Current?.name ?? "NULL"}
-        }
-        else
-        {
-            // StateMachine НЕ НАЙДЕНА!
-        }
-        
-        // Проверяем PatrolState
-        var patrolState = GetComponent<PatrolState>();
-        if (patrolState != null)
-        {
-            // PatrolState найден: {patrolState.name}
-            // PatrolState активен: {patrolState.enabled}
-        }
-        else
-        {
-            // PatrolState НЕ НАЙДЕН!
-        }
-    }
+    [Header("Порог внимания")]
+    [SerializeField, Range(0f, 1f)] private float _attentionThreshold = 0.12f; // 12%
 
     public void CallForBackup()
     {
-        // Находим всех охранников в радиусе и оповещаем их
         Collider[] hits = Physics.OverlapSphere(transform.position, _backupCallRadius);
         foreach (var hit in hits)
         {
@@ -63,34 +39,22 @@ public class SecurityGuard : Enemy
     public void Distract(Vector3 distractionPoint)
     {
         // Реакция на отвлечение (аналогично кассирше)
-        var stateMachine = GetComponent<EnemyStateMachine>();
-        if (stateMachine != null)
-        {
-            stateMachine.SetPatrolDestination(distractionPoint);
-        }
+    }
+
+    private new void CheckForPlayer()
+    {
+        if (SuspicionLevel < _attentionThreshold)
+            return;
     }
 
     protected override void OnPlayerSeen()
     {
-        float suspicionSpeed = _enhancedSuspicionGrowthSpeed;
-        var playerMover = Target != null ? Target.GetComponent<PlayerMover>() : null;
-        
-        if (playerMover != null && playerMover.IsStealthMode)
-        {
-            suspicionSpeed *= _stealthSuspicionMultiplier;
-        }
-        
-        if (Target != null && Target.IsStealing)
-        {
-            suspicionSpeed *= _theftSuspicionMultiplier;
-        }
-        
-        AddSuspicion(suspicionSpeed * Time.deltaTime);
+        if (SuspicionLevel < _attentionThreshold)
+            return;
     }
     
     protected override void OnPlayerHeard(float distance, float noiseLevel)
     {
-        // Охранник более чувствителен к звукам
         float hearingChance = CalculateHearingChance(distance, noiseLevel) * 1.5f;
         if (UnityEngine.Random.value <= hearingChance)
         {
