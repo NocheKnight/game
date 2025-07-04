@@ -98,6 +98,8 @@ public class Shelf : MonoBehaviour
         // Эта проверка больше не нужна для основной логики взаимодействия
     }
 
+    // D:/unity/projects/Kradylechka/Assets/Scripts/Shop/Shelf.cs
+
     public bool TryStealItem(StorableItem itemToSteal, Player player)
     {
         if (itemToSteal == null || !_itemsOnShelf.Contains(itemToSteal) || player == null) return false;
@@ -109,10 +111,15 @@ public class Shelf : MonoBehaviour
             return false;
         }
 
+        // <<< ИСПРАВЛЕНО >>>
+        // Сообщаем миру о ПОПЫТКЕ кражи. Это заменит оба вызова AlertNearbyCustomers.
+        // Теперь любой NPC (покупатель или охранник) сам решит, видел ли он это.
+        itemToSteal.OnStolen();
+
         if (!CheckStealingSuccess(itemToSteal.Goods, player))
         {
             Debug.Log($"Не удалось украсть {itemToSteal.Goods.Label}! Не повезло.");
-            Customer.AlertNearbyCustomers(transform.position, player);
+            // Событие уже отправлено, больше ничего делать не нужно.
             return false;
         }
 
@@ -122,8 +129,6 @@ public class Shelf : MonoBehaviour
         
         _itemsOnShelf.Remove(itemToSteal);
         Destroy(itemToSteal.gameObject);
-
-        Customer.AlertNearbyCustomers(transform.position, player);
 
         if (CurrentItemsCount == 0)
         {

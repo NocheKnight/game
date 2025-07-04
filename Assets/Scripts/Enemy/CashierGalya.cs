@@ -1,7 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Enemy))]
-[RequireComponent(typeof(EnemyStateMachine))]
 public class CashierGalya : MonoBehaviour
 {
     [Header("Особенности Кассирши")]
@@ -20,7 +18,6 @@ public class CashierGalya : MonoBehaviour
     [SerializeField] private AudioClip _chaseSound;
     [SerializeField] private AudioClip _distractionSound;
     
-    private Enemy _enemy;
     private AudioSource _audioSource;
     
     public bool IsDistracted => _isDistracted;
@@ -28,7 +25,6 @@ public class CashierGalya : MonoBehaviour
     
     private void Awake()
     {
-        _enemy = GetComponent<Enemy>();
         _audioSource = GetComponent<AudioSource>();
         
         if (_audioSource == null)
@@ -41,12 +37,7 @@ public class CashierGalya : MonoBehaviour
     
     private void Start()
     {
-        if (_enemy != null)
-        {
-            _enemy.PlayerDetected += OnPlayerDetected;
-            _enemy.PlayerLost += OnPlayerLost;
-            _enemy.AlertedChanged += OnAlertedChanged;
-        }
+        // Удалить все обращения к GetComponent<Enemy>()
     }
     
     private void Update()
@@ -56,14 +47,8 @@ public class CashierGalya : MonoBehaviour
     
     private void SetupValentinaParameters()
     {
-        if (_enemy != null)
-        {
-            // Увеличиваем дальность обнаружения
-            _enemy.SetDetectionRange(_xrayVisionRange);
-            
-            // Увеличиваем поле зрения
-            _enemy.SetFieldOfView(120f); // Широкое поле зрения
-        }
+        // Увеличиваем дальность обнаружения
+        // Удалить все обращения к GetComponent<Enemy>()
     }
     
     private void UpdateDistraction()
@@ -83,11 +68,7 @@ public class CashierGalya : MonoBehaviour
     {
         if (_isDistracted) return;
 
-        var stateMachine = GetComponent<EnemyStateMachine>();
-        if (stateMachine != null)
-        {
-            stateMachine.SetPatrolDestination(distractionPoint);
-        }
+        // Удалить все обращения к GetComponent<EnemyStateMachine>()
 
         StartDistraction("Что-то упало!");
         PlaySound(_distractionSound);
@@ -98,31 +79,24 @@ public class CashierGalya : MonoBehaviour
         _isDistracted = true;
         _distractionTimer = _distractionDuration * _distractionResistance;
         
-        Debug.Log($"Кассирша Валентина отвлечена: {message}");
-        
         // Временно снижаем бдительность
-        if (_enemy != null)
-        {
-            _enemy.ReduceSuspicion(1f); // Полностью сбрасываем подозрения
-        }
+        // Удалить все обращения к GetComponent<Enemy>()
     }
     
     private void EndDistraction()
     {
         _isDistracted = false;
         _distractionTimer = 0f;
-        Debug.Log("Кассирша Галя снова бдительна!");
     }
     
     private void OnPlayerDetected(Player player)
     {
         PlaySound(_detectionSound);
-        Debug.Log("Кассирша Галя видит сквозь одежду! Игрок обнаружен!");
     }
     
     private void OnPlayerLost()
     {
-        Debug.Log("Кассирша Галя потеряла игрока из виду");
+        // Кассирша потеряла игрока
     }
     
     private void OnAlertedChanged(bool isAlerted)
@@ -150,17 +124,12 @@ public class CashierGalya : MonoBehaviour
         
         // Обычное зрение
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _enemy != null ? _enemy.DetectionRange : 10f);
+        // Gizmos.DrawWireSphere(transform.position, _enemy != null ? _enemy.DetectionRange : 10f);
     }
     
     private void OnDestroy()
     {
-        if (_enemy != null)
-        {
-            _enemy.PlayerDetected -= OnPlayerDetected;
-            _enemy.PlayerLost -= OnPlayerLost;
-            _enemy.AlertedChanged -= OnAlertedChanged;
-        }
+        // Удалить все обращения к GetComponent<Enemy>()
     }
     
     [System.Obsolete("Используйте новый метод Distract(Vector3)")]

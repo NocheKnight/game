@@ -177,24 +177,24 @@ public class Player : MonoBehaviour
     // Методы для стелс-механик
     public float GetStealthBonus()
     {
-        return _stealthLevel * 0.1f; // +10% к стелсу за уровень
+        return _stealthLevel * 0.1f;
     }
 
     public float GetPickpocketChance()
     {
-        return Mathf.Min(0.9f, _pickpocketLevel * 0.15f); // Максимум 90% шанс
+        return Mathf.Min(0.9f, _pickpocketLevel * 0.15f);
     }
 
     public float GetDistractionEffectiveness()
     {
-        return _distractionLevel * 0.2f; // +20% эффективности за уровень
+        return _distractionLevel * 0.2f;
     }
 
     private void UpdateInventoryWeight()
     {
         if (_inventory != null)
         {
-            _maxInventoryWeight = 10 + (_stealthLevel - 1) * 2; // +2 к вместимости за уровень стелса
+            _maxInventoryWeight = 10 + (_stealthLevel - 1) * 2;
             _inventory.UpdateMaxWeight(_maxInventoryWeight);
         }
     }
@@ -206,7 +206,11 @@ public class Player : MonoBehaviour
         {
             policeCall.Call(_crimeRate);
         }
-
+        else
+        {
+            Debug.LogWarning("PoliceCall не найден в сцене! Создайте объект с компонентом PoliceCall.");
+        }
+        
         _crimeRate = 0;
         CrimeRateChanged?.Invoke(_crimeRate);
     }
