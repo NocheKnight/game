@@ -29,6 +29,8 @@ public class SaveLoad : MonoBehaviour
         PlayerSave save = LoadSaveSlot(slotIdx);
         GameObject.Find(string.Format("Save{0} Last Update", slotIdx + 1)).GetComponent<TMPro.TextMeshProUGUI>().text =
         "Last update: " + ((DateTime)save.lastUpdateTime).ToLocalTime().ToString("dd.MM.yyyy HH:mm");
+        GameObject.Find(string.Format("Save{0} Level", slotIdx + 1)).GetComponent<TMPro.TextMeshProUGUI>().text =
+        "Stealth level: " + save.stealthLevel.ToString();
     }
 
     public void Save(int slotIdx)
