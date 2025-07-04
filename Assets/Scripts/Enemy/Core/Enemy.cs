@@ -41,17 +41,14 @@ public class Enemy : MonoBehaviour
     public event UnityAction<Player> PlayerDetected;
     public event UnityAction PlayerLost;
     
-    private EnemyStateMachine _stateMachine;
     private PlayerMover _playerMover;
     private Vector3 _startPosition;
     private float _alertTimer = 0f;
     
     private void Awake()
     {
-        _stateMachine = GetComponent<EnemyStateMachine>();
         _startPosition = transform.position;
         
-        // Находим игрока если не назначен
         if (_target == null)
         {
             _target = FindObjectOfType<Player>();
@@ -65,9 +62,14 @@ public class Enemy : MonoBehaviour
     
     private void Start()
     {
-        if (_stateMachine != null)
+        if (_target == null)
         {
-            _stateMachine.Initialize(_target);
+            _target = FindObjectOfType<Player>();
+        }
+        
+        if (_target != null)
+        {
+            _playerMover = _target.GetComponent<PlayerMover>();
         }
     }
     
@@ -80,7 +82,7 @@ public class Enemy : MonoBehaviour
         UpdateSuspicionDecay();
     }
     
-    private void CheckForPlayer()
+    protected void CheckForPlayer()
     {
         if (_target == null) return;
 
@@ -91,7 +93,7 @@ public class Enemy : MonoBehaviour
             if (IsPlayerInFieldOfView())
             {
                 OnPlayerSeen();
-            }
+                }
             
             if (_playerMover != null)
             {
@@ -167,7 +169,6 @@ public class Enemy : MonoBehaviour
         float oldSuspicion = _suspicionLevel;
         _suspicionLevel = Mathf.Clamp01(_suspicionLevel + amount);
         
-        // Проверяем, нужно ли изменить состояние подозрительности
         bool wasSuspicious = _isSuspicious;
         _isSuspicious = _suspicionLevel > 0.1f;
         
@@ -176,7 +177,6 @@ public class Enemy : MonoBehaviour
             SuspiciousChanged?.Invoke(_isSuspicious);
         }
         
-        // Проверяем, нужно ли перейти в состояние тревоги
         if (_suspicionLevel >= _suspicionThreshold && !_isAlerted)
         {
             DetectPlayer();
@@ -193,7 +193,6 @@ public class Enemy : MonoBehaviour
         float oldSuspicion = _suspicionLevel;
         _suspicionLevel = Mathf.Max(0f, _suspicionLevel - amount);
         
-        // Проверяем, нужно ли изменить состояние подозрительности
         bool wasSuspicious = _isSuspicious;
         _isSuspicious = _suspicionLevel > 0.1f;
         
@@ -223,7 +222,6 @@ public class Enemy : MonoBehaviour
             SuspicionLevelChanged?.Invoke(_suspicionLevel);
             PlayerDetected?.Invoke(_target);
             
-            // Добавляем преступность игроку
             _target.AddCrimeRate(50);
         }
     }
@@ -265,7 +263,7 @@ public class Enemy : MonoBehaviour
     public void TakeDamage(int damage)
     {
         _health -= damage;
-        
+
         if (_health <= 0)
         {
             Die();
@@ -288,11 +286,6 @@ public class Enemy : MonoBehaviour
         _isSuspicious = false;
         _suspicionLevel = 0f;
         _alertTimer = 0f;
-        
-        if (_stateMachine != null)
-        {
-            _stateMachine.ResetToFirstState();
-        }
         
         AlertedChanged?.Invoke(_isAlerted);
         SuspiciousChanged?.Invoke(_isSuspicious);
@@ -334,7 +327,6 @@ public class Enemy : MonoBehaviour
     
     protected virtual void OnPlayerSeen() 
     { 
-        // Базовый метод - можно переопределить в наследниках
         float detectionChance = CalculateDetectionChance();
         if (UnityEngine.Random.value <= detectionChance)
         {
@@ -344,7 +336,6 @@ public class Enemy : MonoBehaviour
     
     protected virtual void OnPlayerHeard(float distance, float noiseLevel) 
     { 
-        // Базовый метод - можно переопределить в наследниках
         float hearingChance = CalculateHearingChance(distance, noiseLevel);
         if (UnityEngine.Random.value <= hearingChance)
         {
@@ -354,7 +345,6 @@ public class Enemy : MonoBehaviour
     
     protected virtual void OnPlayerOutOfRange() 
     { 
-        // Базовый метод - можно переопределить в наследниках
         // Подозрения спадают автоматически в UpdateSuspicionDecay()
     }
     

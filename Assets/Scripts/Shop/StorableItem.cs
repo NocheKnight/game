@@ -39,4 +39,17 @@ public class StorableItem : MonoBehaviour
         if (this == null || _renderer == null) return;
         _renderer.material = _originalMaterial;
     }
-} 
+    public void OnStolen()
+    {
+        if (_goods == null) return;
+
+        // Количество подозрений зависит от сложности кражи и цены товара
+        float suspicionAmount = 15f + (_goods.Price / 5f) + (_goods.StealingDifficulty * 5f);
+
+        var theftEvent = new SuspicionEvent(transform.position, suspicionAmount, SuspicionType.Theft);
+        
+        // Отправляем событие в "эфир"
+        SuspicionEvents.Raise(theftEvent);
+        Debug.Log($"Событие кражи {_goods.Label} создано в точке {transform.position} с силой {suspicionAmount}");
+    }
+}

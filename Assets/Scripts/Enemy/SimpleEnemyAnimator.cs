@@ -13,13 +13,11 @@ public class SimpleEnemyAnimator : MonoBehaviour
     [SerializeField] private string _suspiciousState = "Suspicious";
     
     private Enemy _enemy;
-    private EnemyStateMachine _stateMachine;
     private string _currentState = "";
     
     private void Start()
     {
         _enemy = GetComponent<Enemy>();
-        _stateMachine = GetComponent<EnemyStateMachine>();
         
         if (_animator == null)
         {
@@ -49,31 +47,18 @@ public class SimpleEnemyAnimator : MonoBehaviour
     
     private string DetermineTargetState()
     {
-        // Проверяем состояния стейт-машины
-        if (_stateMachine != null)
+        // Проверяем состояния через Enemy или GuardLogic
+        if (_enemy != null)
         {
-            var currentState = _stateMachine.Current;
-            if (currentState != null)
-            {
-                if (currentState.GetType() == typeof(ChaseState))
-                {
-                    return _runState;
-                }
-                else if (currentState.GetType() == typeof(SuspiciousState))
-                {
-                    return _suspiciousState;
-                }
-                else if (currentState.GetType() == typeof(PatrolState))
-                {
-                    // Проверяем, движется ли охранник
-                    if (IsMoving())
-                    {
-                        return _walkState;
-                    }
-                }
-            }
+            // Пример: если Enemy в тревоге — бег
+            if (_enemy.IsAlerted)
+                return _runState;
+            if (_enemy.IsSuspicious)
+                return _suspiciousState;
+            // Можно добавить свою логику для патруля и движения
+            if (IsMoving())
+                return _walkState;
         }
-        
         return _idleState;
     }
     

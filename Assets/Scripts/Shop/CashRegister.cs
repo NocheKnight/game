@@ -63,7 +63,6 @@ public class CashRegister : MonoBehaviour
             _playerInventory = _player.GetComponent<PlayerInventory>();
         }
         
-        // Скрываем UI мини-игры
         if (_minigameUI != null)
         {
             _minigameUI.SetActive(false);
