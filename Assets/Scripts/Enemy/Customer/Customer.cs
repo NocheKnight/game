@@ -50,6 +50,20 @@ public class Customer : MonoBehaviour
     {
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
+        
+        // Проверяем инициализацию NavMeshAgent
+        if (Agent == null)
+        {
+            Debug.LogError($"Customer {name}: NavMeshAgent не найден!");
+            return;
+        }
+        
+        // Убеждаемся, что агент активен
+        if (!Agent.isActiveAndEnabled)
+        {
+            Debug.LogWarning($"Customer {name}: NavMeshAgent не активен!");
+        }
+        
         InitializeStateMachine();
     }
 
