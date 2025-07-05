@@ -10,8 +10,7 @@ public class PlayerInput : MonoBehaviour
     [SerializeField] private KeyCode _interactKey = KeyCode.E;
     [SerializeField] private KeyCode _throwMoneyKey = KeyCode.G;
     [SerializeField] private KeyCode _shoutKey = KeyCode.Q;
-    [SerializeField] private KeyCode _runKey = KeyCode.Space;
-    [SerializeField] private KeyCode _stealthKey = KeyCode.LeftShift;
+    [SerializeField] private KeyCode _runKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode _crouchKey = KeyCode.LeftControl;
     [SerializeField] private KeyCode _cursorKey = KeyCode.Escape;
 

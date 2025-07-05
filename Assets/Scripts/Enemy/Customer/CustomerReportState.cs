@@ -38,6 +38,8 @@ public class CustomerReportState : IState
 
                 // Идем к охраннику
                 _customer.Agent.SetDestination(_targetGuard.transform.position);
+                
+                Debug.Log($"{_customer.name} направляется к охраннику {_targetGuard.name} на расстоянии {Vector3.Distance(_customer.transform.position, _targetGuard.transform.position)}м");
             }
             else
             {
@@ -57,6 +59,7 @@ public class CustomerReportState : IState
         // Если время истекло, успокаиваемся
         if (_reportTimer <= 0f)
         {
+            Debug.Log($"{_customer.name} устал искать охранника, успокаивается");
             _customer.CalmDown();
             return;
         }
@@ -69,9 +72,35 @@ public class CustomerReportState : IState
         {
             float distanceToGuard = Vector3.Distance(_customer.transform.position, _targetGuard.transform.position);
             
+            // Если охранник слишком далеко, проверяем, есть ли более близкий
+            if (distanceToGuard > 50f)
+            {
+                SecurityGuard closerGuard = FindNearestGuard();
+                if (closerGuard != null && closerGuard != _targetGuard)
+                {
+                    float distanceToCloser = Vector3.Distance(_customer.transform.position, closerGuard.transform.position);
+                    if (distanceToCloser < distanceToGuard)
+                    {
+                        _targetGuard = closerGuard;
+                        _customer.Agent.SetDestination(_targetGuard.transform.position);
+                        Debug.Log($"{_customer.name} нашел более близкого охранника {_targetGuard.name}");
+                    }
+                }
+            }
+            
             if (distanceToGuard < 2f) // В пределах 2 метров от охранника
             {
                 ReportToGuard();
+            }
+        }
+        else if (_targetGuard == null)
+        {
+            // Если охранник исчез, ищем нового
+            _targetGuard = FindNearestGuard();
+            if (_targetGuard != null && _customer.Agent != null && _customer.Agent.isActiveAndEnabled)
+            {
+                _customer.Agent.SetDestination(_targetGuard.transform.position);
+                Debug.Log($"{_customer.name} нашел нового охранника {_targetGuard.name}");
             }
         }
     }
