@@ -104,7 +104,7 @@ public class PlayerDistractions : MonoBehaviour
         CreateDistraction(distractionPoint, _moneyThrowRange);
         CreateCoinEffect(distractionPoint);
 
-        PlaySound(_moneyThrowSound);
+            PlaySound(_moneyThrowSound);
         Debug.Log("Подброшен рубль!");
 
         _canThrowMoney = false;
@@ -132,7 +132,7 @@ public class PlayerDistractions : MonoBehaviour
 
         CreateDistraction(transform.position, _shoutRange);
         
-        PlaySound(_shoutSound);
+            PlaySound(_shoutSound);
         Debug.Log($"Крик об акции! Откликнулось покупателей: {customersAlerted}");
         
         _canShout = false;
@@ -154,7 +154,7 @@ public class PlayerDistractions : MonoBehaviour
         {
             float dist = Vector3.Distance(transform.position, shelf.transform.position);
             if (dist < minDist)
-            {
+    {
                 minDist = dist;
                 nearest = shelf;
             }
@@ -168,7 +168,7 @@ public class PlayerDistractions : MonoBehaviour
     }
     
     private void CreateDistraction(Vector3 position, float radius)
-    {
+        {
         GameObject distractionObject = new GameObject("DistractionZone");
         distractionObject.transform.position = position;
         
@@ -204,9 +204,9 @@ public class PlayerDistractions : MonoBehaviour
         Vector3 startPosition = coin.transform.position;
         Vector3 endPosition = targetPosition;
         float elapsedTime = 0f;
-        
+            
         while (elapsedTime < _coinFallDuration)
-        {
+            {
             elapsedTime += Time.deltaTime;
             float progress = elapsedTime / _coinFallDuration;
             
@@ -216,15 +216,15 @@ public class PlayerDistractions : MonoBehaviour
             
             coin.transform.position = currentPosition;
             coin.transform.Rotate(Vector3.forward, 360f * Time.deltaTime);
+                
+                yield return null;
+            }
             
-            yield return null;
-        }
-        
         coin.transform.position = endPosition;
         CreateLandingEffect(endPosition);
         Destroy(coin, 2f);
-    }
-    
+        }
+        
     private void CreateLandingEffect(Vector3 position)
     {
         if (_coinSparkleEffect != null)
@@ -280,9 +280,28 @@ public class DistractionZone : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
         foreach (var hitCollider in hitColliders)
         {
+            // Реакция кассирши на отвлечение
             if (hitCollider.TryGetComponent<CashierGalya>(out var cashier))
             {
                 cashier.Distract(transform.position); 
+            }
+            
+            // Реакция покупателей на монетку
+            if (hitCollider.TryGetComponent<Customer>(out var customer))
+            {
+                customer.AnnouncePromo(transform.position);
+            }
+            
+            // Реакция охранников на отвлечение
+            if (hitCollider.TryGetComponent<SecurityGuard>(out var guard))
+            {
+                guard.Distract(transform.position);
+            }
+            
+            // Реакция через GuardLogic (если используется)
+            if (hitCollider.TryGetComponent<GuardLogic>(out var guardLogic))
+            {
+                guardLogic.AddSuspicion(10f, transform.position);
             }
         }
     }

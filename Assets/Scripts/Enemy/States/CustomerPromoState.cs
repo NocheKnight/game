@@ -16,11 +16,26 @@ public class CustomerPromoState : IState
         Debug.Log($"{_customer.name} услышал про акцию и бежит к {_customer.PromoTargetLocation}!");
         _interestTimer = 15f;
 
-        _customer.Agent.isStopped = false;
-        _customer.Agent.speed = _customer.PromoSpeed;
-        if (_customer.Animator != null) _customer.Animator.SetBool("IsRunning", true);
+        // Проверяем, что агент активен и на NavMesh
+        if (_customer.Agent != null && _customer.Agent.isActiveAndEnabled && _customer.Agent.isOnNavMesh)
+        {
+            _customer.Agent.isStopped = false;
+            _customer.Agent.speed = _customer.PromoSpeed;
+            
+            // Включаем анимацию бега для быстрого движения к акции
+            if (_customer.Animator != null)
+            {
+                _customer.Animator.SetBool("IsWalking", false);
+                _customer.Animator.SetBool("IsRunning", true);
+                _customer.Animator.SetFloat("Speed", _customer.PromoSpeed);
+            }
 
-        _customer.Agent.SetDestination(_customer.PromoTargetLocation);
+            _customer.Agent.SetDestination(_customer.PromoTargetLocation);
+        }
+        else
+        {
+            Debug.LogWarning($"Customer {_customer.name}: NavMeshAgent не активен или не на NavMesh в PromoState");
+        }
     }
 
     public void Update()
@@ -30,10 +45,42 @@ public class CustomerPromoState : IState
         {
             _customer.LoseInterestInPromo();
         }
+        
+        // Обновляем анимацию на основе скорости движения
+        UpdateAnimationBasedOnSpeed();
     }
 
     public void Exit()
     {
-        if (_customer.Animator != null) _customer.Animator.SetBool("IsRunning", false);
+        // Выключаем анимацию бега
+        if (_customer.Animator != null)
+        {
+            _customer.Animator.SetBool("IsWalking", false);
+            _customer.Animator.SetBool("IsRunning", false);
+            _customer.Animator.SetFloat("Speed", 0f);
+        }
+    }
+    
+    private void UpdateAnimationBasedOnSpeed()
+    {
+        if (_customer.Animator == null || _customer.Agent == null) return;
+
+        float currentSpeed = _customer.Agent.velocity.magnitude;
+        float speedThreshold = 0.1f;
+
+        if (currentSpeed > speedThreshold)
+        {
+            // Если движемся быстро, включаем анимацию бега
+            _customer.Animator.SetBool("IsWalking", false);
+            _customer.Animator.SetBool("IsRunning", true);
+            _customer.Animator.SetFloat("Speed", currentSpeed);
+        }
+        else
+        {
+            // Если стоим, выключаем анимации движения
+            _customer.Animator.SetBool("IsWalking", false);
+            _customer.Animator.SetBool("IsRunning", false);
+            _customer.Animator.SetFloat("Speed", 0f);
+        }
     }
 }

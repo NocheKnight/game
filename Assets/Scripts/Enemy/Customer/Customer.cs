@@ -50,6 +50,20 @@ public class Customer : MonoBehaviour
     {
         Agent = GetComponent<NavMeshAgent>();
         Animator = GetComponent<Animator>();
+        
+        // Проверяем инициализацию NavMeshAgent
+        if (Agent == null)
+        {
+            Debug.LogError($"Customer {name}: NavMeshAgent не найден!");
+            return;
+        }
+        
+        // Убеждаемся, что агент активен
+        if (!Agent.isActiveAndEnabled)
+        {
+            Debug.LogWarning($"Customer {name}: NavMeshAgent не активен!");
+        }
+        
         InitializeStateMachine();
     }
 
@@ -76,15 +90,44 @@ public class Customer : MonoBehaviour
         var patrolState = new CustomerPatrolState(this);
         var fleeState = new CustomerFleeState(this);
         var promoState = new CustomerPromoState(this);
+        var reportState = new CustomerReportState(this);
 
-        _stateMachine.AddAnyTransition(fleeState, () => _hasWitnessedTheft);
+        // Приоритет: сначала пытаемся найти охранника, если не найден - убегаем
+        _stateMachine.AddAnyTransition(reportState, () => _hasWitnessedTheft && FindNearestGuard() != null);
+        _stateMachine.AddAnyTransition(fleeState, () => _hasWitnessedTheft && FindNearestGuard() == null);
         
         _stateMachine.AddTransition(patrolState, promoState, () => _isLuredByPromo);
 
         _stateMachine.AddTransition(fleeState, patrolState, () => !_hasWitnessedTheft);
         _stateMachine.AddTransition(promoState, patrolState, () => !_isLuredByPromo);
+        _stateMachine.AddTransition(reportState, patrolState, () => !_hasWitnessedTheft);
 
         _stateMachine.SetState(patrolState);
+    }
+    
+    private SecurityGuard FindNearestGuard()
+    {
+        SecurityGuard[] guards = Object.FindObjectsOfType<SecurityGuard>();
+        
+        if (guards.Length == 0)
+        {
+            return null;
+        }
+        
+        SecurityGuard nearest = null;
+        float minDistance = float.MaxValue;
+        
+        foreach (var guard in guards)
+        {
+            float distance = Vector3.Distance(transform.position, guard.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearest = guard;
+            }
+        }
+        
+        return nearest;
     }
 
 

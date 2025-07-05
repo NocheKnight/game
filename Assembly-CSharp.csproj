@@ -58,16 +58,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\DoorMotion.cs" />
      <Compile Include="Assets\Scripts\Enemy\CashierGalya.cs" />
-     <Compile Include="Assets\Scripts\Enemy\Customer.cs" />
-     <Compile Include="Assets\Scripts\Enemy\Enemy.cs" />
-     <Compile Include="Assets\Scripts\Enemy\EnemyAnimator.cs" />
-     <Compile Include="Assets\Scripts\Enemy\SecurityGuard.cs" />
-     <Compile Include="Assets\Scripts\Enemy\SimpleEnemyAnimator.cs" />
-     <Compile Include="Assets\Scripts\Enemy\SimpleSuspicionIndicator.cs" />
-     <Compile Include="Assets\Scripts\Enemy\State Machine\ChaseState.cs" />
-     <Compile Include="Assets\Scripts\Enemy\State Machine\EnemyStateMachine.cs" />
-     <Compile Include="Assets\Scripts\Enemy\State Machine\PatrolState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Core\Enemy.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Core\EnemyAnimator.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Core\EnemyStateMachine.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Customer\Customer.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Customer\CustomerFleeState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Customer\CustomerPatrolState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Customer\CustomerReportState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Guards\GuardLogic.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Guards\SecurityGuard.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\State.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\SuspiciousState.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transition.cs" />
@@ -76,9 +77,17 @@
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\ReturnToPatrolTransition.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\SuspicionClearedTransition.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transitions\SuspiciousTransition.cs" />
-     <Compile Include="Assets\Scripts\Enemy\SuspicionIndicator.cs" />
+     <Compile Include="Assets\Scripts\Enemy\States\Base\IState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\States\ChaseState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\States\CustomerPromoState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\States\IdleState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\States\InvestigateState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\States\PatrolState.cs" />
      <Compile Include="Assets\Scripts\Enemy\WorldSpaceSuspicionIndicator.cs" />
+     <Compile Include="Assets\Scripts\Events\SuspicionEvents.cs" />
      <Compile Include="Assets\Scripts\ExitTrigger.cs" />
+     <Compile Include="Assets\Scripts\Items\StealableItem.cs" />
+     <Compile Include="Assets\Scripts\Player\CoinEffect.cs" />
      <Compile Include="Assets\Scripts\Player\Player.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerAnimator.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerDistractions.cs" />
@@ -93,14 +102,17 @@
      <Compile Include="Assets\Scripts\Shop\Shelf.cs" />
      <Compile Include="Assets\Scripts\Shop\SimpleItemPrefab.cs" />
      <Compile Include="Assets\Scripts\Shop\StorableItem.cs" />
+     <Compile Include="Assets\Scripts\SlidingDoorMotion.cs" />
      <Compile Include="Assets\Scripts\UI\ButtonTester.cs" />
+     <Compile Include="Assets\Scripts\UI\EndSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\GameOverUI.cs" />
      <Compile Include="Assets\Scripts\UI\GameUITester.cs" />
-     <Compile Include="Assets\Scripts\UI\PlayerStatsUI.cs" />
+     <Compile Include="Assets\Scripts\UI\PlayerStstsUI.cs" />
      <Compile Include="Assets\Scripts\UI\SimpleGameUI.cs" />
      <Compile Include="Assets\Scripts\UI\SimplePlayerStatsUI.cs" />
      <Compile Include="Assets\Scripts\UI\WinUI.cs" />
      <None Include="Assets\FREE Food Pack\Shaders\Food.shader" />
+     <None Include="Assets\BarProps\Credits.txt" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>

@@ -9,20 +9,20 @@ public class Player : MonoBehaviour
     [SerializeField] private int _health = 100;
     [SerializeField] private int _satiety = 100;
     [SerializeField] private int _maxInventoryWeight = 10;
-    
+
     [Header("Навыки воровства")]
-    [SerializeField] private int _stealthLevel = 1;
-    [SerializeField] private int _pickpocketLevel = 1;
-    [SerializeField] private int _distractionLevel = 1;
-    
+    [SerializeField] private static int _stealthLevel = 1;
+    [SerializeField] private static int _pickpocketLevel = 1;
+    [SerializeField] private static int _distractionLevel = 1;
+
     [Header("Экономика")]
-    [SerializeField] private int _money = 0;
+    [SerializeField] private static int _money = 1000;
     [SerializeField] private int _fine = 0;
-    
+
     private int _crimeRate;
     private PlayerInventory _inventory;
     private PlayerMover _mover;
-    
+
     public int Money => _money;
     public int Fine => _fine;
     public int CrimeRate => _crimeRate;
@@ -30,9 +30,9 @@ public class Player : MonoBehaviour
     public int PickpocketLevel => _pickpocketLevel;
     public int DistractionLevel => _distractionLevel;
     public int MaxInventoryWeight => _maxInventoryWeight;
-    
+
     public bool IsStealing { get; private set; }
-    
+
     public event UnityAction<int> MoneyChanged;
     public event UnityAction<int> FineChanged;
     public event UnityAction<int> CrimeRateChanged;
@@ -40,13 +40,13 @@ public class Player : MonoBehaviour
     public event UnityAction<int> PickpocketLevelChanged;
     public event UnityAction<int> DistractionLevelChanged;
     public event UnityAction PlayerDied;
-    
+
     private void Awake()
     {
         _inventory = GetComponent<PlayerInventory>();
         _mover = GetComponent<PlayerMover>();
     }
-    
+
     private void Start()
     {
         UpdateInventoryWeight();
@@ -65,7 +65,7 @@ public class Player : MonoBehaviour
         _money += money;
         MoneyChanged?.Invoke(_money);
     }
-    
+
     public bool SpendMoney(int amount)
     {
         if (_money >= amount)
@@ -76,18 +76,18 @@ public class Player : MonoBehaviour
         }
         return false;
     }
-    
+
     public void AddFine(int fineAmount)
     {
         _fine += fineAmount;
         FineChanged?.Invoke(_fine);
-        
+
         if (_money >= _fine)
         {
             PayFine();
         }
     }
-    
+
     public void PayFine()
     {
         if (_money >= _fine)
@@ -103,14 +103,14 @@ public class Player : MonoBehaviour
     {
         _crimeRate += crimePoint;
         CrimeRateChanged?.Invoke(_crimeRate);
-        
+
 
         if (_crimeRate >= 100)
         {
             CallPolice();
         }
     }
-    
+
     public void ReduceCrimeRate(int reduction)
     {
         _crimeRate = Mathf.Max(0, _crimeRate - reduction);
@@ -121,10 +121,10 @@ public class Player : MonoBehaviour
     {
         AddCrimeRate(crimePoint);
     }
-    
+
     public bool TryUpgradeStealth()
     {
-        int cost = _stealthLevel * 100;
+        int cost = GetStealthUpdateCost();
         if (SpendMoney(cost))
         {
             _stealthLevel++;
@@ -134,10 +134,15 @@ public class Player : MonoBehaviour
         }
         return false;
     }
-    
+
+    public int GetStealthUpdateCost()
+    {
+        return _stealthLevel * 100;
+    }
+
     public bool TryUpgradePickpocket()
     {
-        int cost = _pickpocketLevel * 150;
+        int cost = GetPickpocketUpdateCost();
         if (SpendMoney(cost))
         {
             _pickpocketLevel++;
@@ -146,10 +151,15 @@ public class Player : MonoBehaviour
         }
         return false;
     }
-    
+
+    public int GetPickpocketUpdateCost()
+    {
+        return _pickpocketLevel * 150;
+    }
+
     public bool TryUpgradeDistraction()
     {
-        int cost = _distractionLevel * 120;
+        int cost = GetDistractionUpdateCost();
         if (SpendMoney(cost))
         {
             _distractionLevel++;
@@ -158,22 +168,28 @@ public class Player : MonoBehaviour
         }
         return false;
     }
-    
+
+    public int GetDistractionUpdateCost()
+    {
+        return _distractionLevel * 120; ;
+    }
+
+    // Методы для стелс-механик
     public float GetStealthBonus()
     {
         return _stealthLevel * 0.1f;
     }
-    
+
     public float GetPickpocketChance()
     {
         return Mathf.Min(0.9f, _pickpocketLevel * 0.15f);
     }
-    
+
     public float GetDistractionEffectiveness()
     {
         return _distractionLevel * 0.2f;
     }
-    
+
     private void UpdateInventoryWeight()
     {
         if (_inventory != null)
@@ -182,7 +198,7 @@ public class Player : MonoBehaviour
             _inventory.UpdateMaxWeight(_maxInventoryWeight);
         }
     }
-    
+
     private void CallPolice()
     {
         var policeCall = FindObjectOfType<PoliceCall>();
@@ -214,5 +230,18 @@ public class Player : MonoBehaviour
     private void ResetStealing()
     {
         IsStealing = false;
+    }
+
+    public PlayerSave ToPlayerSave()
+    {
+        return new PlayerSave(_stealthLevel, _pickpocketLevel, _distractionLevel, _money);
+    }
+
+    public void FromPlayerSave(PlayerSave save)
+    {
+        _stealthLevel = save.stealthLevel;
+        _pickpocketLevel = save.pickpocketLevel;
+        _distractionLevel = save.distractionLevel;
+        _money = save.money;
     }
 }

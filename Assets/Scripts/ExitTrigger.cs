@@ -1,103 +1,82 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ExitTrigger : MonoBehaviour
 {
     [Header("Настройки выхода")]
-    [SerializeField] private string _playerTag = "Player";
-    [SerializeField] private bool _requireItems = true;
-    [SerializeField] private int _minItemsRequired = 1;
-    [SerializeField] private string _exitMessage = "Выход";
-    
-    [Header("UI")]
-    [SerializeField] private WinUI _winUI;
-    
-    private void Start()
-    {
-        // Ищем WinUI если не назначен
-        if (_winUI == null)
-        {
-            _winUI = FindObjectOfType<WinUI>();
-        }
-    }
+    [SerializeField] private string _endSceneFailedName = "GameOver";
+    [SerializeField] private string _endSceneSuccessName = "GameResults";
+    [SerializeField] private LayerMask _playerLayer = 1;
+    [SerializeField] private bool _requireStealth = true;
     
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(_playerTag))
-        {
-            Player player = other.GetComponent<Player>();
-            if (player != null)
-            {
-                CheckExitConditions(player);
-            }
-        }
-    }
-    
-    private void CheckExitConditions(Player player)
-    {
-        var inventory = player.GetComponent<PlayerInventory>();
-        if (inventory == null) return;
+        Debug.Log("Trigger");
+        // Проверяем, что это игрок
+        if (((1 << other.gameObject.layer) & _playerLayer) == 0) return;
         
-        // Проверяем, есть ли украденные предметы
-        if (_requireItems)
-        {
-            int stolenItems = inventory.GetStolenItemsCount();
-            if (stolenItems < _minItemsRequired)
-            {
-                ShowNotEnoughItemsMessage();
-                return;
-            }
-        }
+        Player player = other.GetComponent<Player>();
+        if (player == null) return;
         
-        // Условия выполнены - показываем победу
-        ShowWinScreen();
-    }
-    
-    private void ShowNotEnoughItemsMessage()
-    {
-        // Можно показать сообщение игроку
-        Debug.Log($"Нужно украсть минимум {_minItemsRequired} предметов для выхода!");
-        
-        // Здесь можно добавить UI сообщение
-        // Например, временный текст на экране
-    }
-    
-    private void ShowWinScreen()
-    {
-        if (_winUI != null)
+        // Проверяем условия выхода
+        if (CanExit(player))
         {
-            _winUI.ShowEscapeWin();
+            ExitSuccessfully(player);
         }
         else
         {
-            Debug.LogWarning("WinUI не найден! Создайте WinUI в сцене.");
+            ExitFailed(player);
         }
     }
     
-    // Методы для отладки в инспекторе
-    [ContextMenu("Проверить выход")]
+    private bool CanExit(Player player)
+    {
+        // Если не требуется стелс, то можно выйти всегда
+        if (!_requireStealth) return true;
+        
+        // Проверяем, что игрок не в стелс-режиме (т.е. его не поймали)
+        PlayerMover mover = player.GetComponent<PlayerMover>();
+        if (mover != null && mover.IsStealthMode)
+        {
+            return true;
+        }
+        
+        // Проверяем уровень преступности
+        if (player.CrimeRate < 100) // Можно настроить порог
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private void ExitSuccessfully(Player player)
+    {   
+        // Сохраняем статистику игрока (можно расширить)
+        PlayerPrefs.SetInt("FinalCrimeRate", player.CrimeRate);
+        PlayerPrefs.SetFloat("StealthBonus", player.GetStealthBonus());
+        PlayerPrefs.Save();
+        
+        SceneManager.LoadScene(_endSceneSuccessName);
+    }
+    
+    private void ExitFailed(Player player)
+    {
+        // Можно добавить эффекты или звуки
+        // Например, включить сирену, вызвать полицию и т.д.
+        
+        // Пока что просто перезагружаем текущую сцену
+        SceneManager.LoadScene(_endSceneFailedName);
+    }
+    
+    // Метод для тестирования
+    [ContextMenu("Test Exit")]
     private void TestExit()
     {
         Player player = FindObjectOfType<Player>();
         if (player != null)
         {
-            CheckExitConditions(player);
+            ExitSuccessfully(player);
         }
-    }
-    
-    [ContextMenu("Показать победу")]
-    private void TestWin()
-    {
-        ShowWinScreen();
-    }
-    
-    private void OnDrawGizmos()
-    {
-        // Визуализация триггера в редакторе
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(transform.position, transform.localScale);
-        
-        // Подпись
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(transform.position + Vector3.up * 2f, 0.2f);
     }
 } 

@@ -17,7 +17,7 @@ public class PlayerInventory : MonoBehaviour
     [SerializeField] private float _fragileItemWeight = 0.5f;
     [SerializeField] private float _heavyItemWeight = 2f;
     
-    private List<Goods> _goods = new List<Goods>();
+    private static List<Goods> _goods = new List<Goods>();
     private Player _player;
     private PlayerMover _mover;
     
