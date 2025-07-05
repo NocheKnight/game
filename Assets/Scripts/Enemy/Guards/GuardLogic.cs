@@ -14,7 +14,7 @@ public class GuardLogic : MonoBehaviour
 
     [Header("Senses")]
     [Tooltip("Максимальное расстояние, на котором охранник может заметить подозрительное событие.")]
-    [SerializeField] private float _sightRadius = 20f;
+    [SerializeField] private float _sightRadius = 40f;
 
     [Header("Movement Speeds")]
     [SerializeField] private float _patrolSpeed = 2f;
@@ -23,7 +23,7 @@ public class GuardLogic : MonoBehaviour
 
     [Header("Chase Logic")]
     [Tooltip("На каком расстоянии от игрока охранник его ловит.")]
-    [SerializeField] private float _catchDistance = 1.5f;
+    [SerializeField] private float _catchDistance = 2f;
 
     [Header("Live State (for debugging)")]
     [Tooltip("Текущий уровень подозрительности (0-100)")]

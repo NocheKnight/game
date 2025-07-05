@@ -95,6 +95,7 @@
      <Compile Include="Assets\Scripts\Player\PlayerInteraction.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerInventory.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerMover.cs" />
+     <Compile Include="Assets\Scripts\Player\PlayerSave.cs" />
      <Compile Include="Assets\Scripts\Police\PoliceCall.cs" />
      <Compile Include="Assets\Scripts\ScriptableObjects\Goods.cs" />
      <Compile Include="Assets\Scripts\Shop\CashRegister.cs" />
@@ -105,41 +106,43 @@
      <Compile Include="Assets\Scripts\SlidingDoorMotion.cs" />
      <Compile Include="Assets\Scripts\UI\ButtonTester.cs" />
      <Compile Include="Assets\Scripts\UI\EndSceneController.cs" />
+     <Compile Include="Assets\Scripts\UI\Game.cs" />
+     <Compile Include="Assets\Scripts\UI\GameOver.cs" />
      <Compile Include="Assets\Scripts\UI\GameOverUI.cs" />
+     <Compile Include="Assets\Scripts\UI\GameResults.cs" />
      <Compile Include="Assets\Scripts\UI\GameUITester.cs" />
-     <Compile Include="Assets\Scripts\UI\PlayerStstsUI.cs" />
+     <Compile Include="Assets\Scripts\UI\MainMenu.cs" />
+     <Compile Include="Assets\Scripts\UI\PlayerStatsUI.cs" />
+     <Compile Include="Assets\Scripts\UI\SaveLoad.cs" />
      <Compile Include="Assets\Scripts\UI\SimpleGameUI.cs" />
      <Compile Include="Assets\Scripts\UI\SimplePlayerStatsUI.cs" />
+     <Compile Include="Assets\Scripts\UI\Upgrades.cs" />
      <Compile Include="Assets\Scripts\UI\WinUI.cs" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
      <None Include="Assets\FREE Food Pack\Shaders\Food.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
+     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
      <None Include="Assets\BarProps\Credits.txt" />
- <Reference Include="Unity.Timeline.Editor">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.VSCode.Editor">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.UI">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Timeline">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
- </Reference>
- <Reference Include="Unity.CollabProxy.Editor">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Rider.Editor">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.TextMeshPro">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
- </Reference>
- <Reference Include="UnityEditor.UI">
- <HintPath>D:/unity/projects/Kradylechka/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
- </Reference>
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
  <Reference Include="UnityEngine.AIModule">
  <HintPath>D:/unity/2019.4.18f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
  </Reference>
