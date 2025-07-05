@@ -18481,7 +18481,7 @@ Transform:
 --- !u!1 &705841284
 GameObject:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 100000, guid: 9911bb6161cb24661bf3177514e2008d, type: 3}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
@@ -23790,7 +23790,7 @@ GameObject:
   m_Component:
   - component: {fileID: 935977835}
   - component: {fileID: 935977834}
-  - component: {fileID: 935977833}
+  - component: {fileID: 935977836}
   m_Layer: 0
   m_Name: exit
   m_TagString: Untagged
@@ -23798,23 +23798,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &935977833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 935977832}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c421fb319db9e24d994ff4c34303988, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerTag: Player
-  _requireItems: 1
-  _minItemsRequired: 1
-  _exitMessage: "\u0412\u044B\u0445\u043E\u0434"
-  _winUI: {fileID: 0}
 --- !u!65 &935977834
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23851,6 +23834,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &935977836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935977832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c421fb319db9e24d994ff4c34303988, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _endSceneFailedName: GameOver
+  _endSceneSuccessName: GameResults
+  _playerLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  _requireStealth: 1
 --- !u!1 &940191016
 GameObject:
   m_ObjectHideFlags: 0
@@ -28828,8 +28829,7 @@ MonoBehaviour:
   _moneyThrowSound: {fileID: 0}
   _shoutSound: {fileID: 0}
   _coinDropSound: {fileID: 0}
-  _coinPrefab: {fileID: 2552063308681456351, guid: 9f8fd20bc5623f646acbac1a330f9f31,
-    type: 3}
+  _coinPrefab: {fileID: 2552063308681456351, guid: 9f8fd20bc5623f646acbac1a330f9f31, type: 3}
   _coinSparkleEffect: {fileID: 0}
   _coinFallHeight: 2
   _coinFallDuration: 1
@@ -58554,6 +58554,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100166, guid: eb062aa776e44954d94c4c2f76ebc148, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1072465233}
+    - targetCorrespondingSourceObject: {fileID: 100166, guid: eb062aa776e44954d94c4c2f76ebc148, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1072465241}
     - targetCorrespondingSourceObject: {fileID: 100046, guid: eb062aa776e44954d94c4c2f76ebc148, type: 3}
       insertIndex: -1
       addedObject: {fileID: 211965240}

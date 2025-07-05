@@ -4,16 +4,14 @@ using UnityEngine.SceneManagement;
 public class ExitTrigger : MonoBehaviour
 {
     [Header("Настройки выхода")]
-    [SerializeField] private string _endSceneName = "EndScene";
+    [SerializeField] private string _endSceneFailedName = "GameOver";
+    [SerializeField] private string _endSceneSuccessName = "GameResults";
     [SerializeField] private LayerMask _playerLayer = 1;
     [SerializeField] private bool _requireStealth = true;
     
-    [Header("Сообщения")]
-    [SerializeField] private string _successMessage = "Вы успешно вышли из магазина!";
-    [SerializeField] private string _caughtMessage = "Вас поймали! Попробуйте снова.";
-    
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Trigger");
         // Проверяем, что это игрок
         if (((1 << other.gameObject.layer) & _playerLayer) == 0) return;
         
@@ -32,10 +30,7 @@ public class ExitTrigger : MonoBehaviour
     }
     
     private bool CanExit(Player player)
-    {
-        // Если не требуется стелс, то можно выйти всегда
-        if (!   ) return true;
-        
+    {   
         // Проверяем, что игрок не в стелс-режиме (т.е. его не поймали)
         PlayerMover mover = player.GetComponent<PlayerMover>();
         if (mover != null && mover.IsStealthMode)
@@ -53,31 +48,22 @@ public class ExitTrigger : MonoBehaviour
     }
     
     private void ExitSuccessfully(Player player)
-    {
-        Debug.Log(_successMessage);
-        
+    {   
         // Сохраняем статистику игрока (можно расширить)
         PlayerPrefs.SetInt("FinalCrimeRate", player.CrimeRate);
         PlayerPrefs.SetFloat("StealthBonus", player.GetStealthBonus());
         PlayerPrefs.Save();
         
-        LoadEndScene();
+        SceneManager.LoadScene(_endSceneSuccessName);
     }
     
     private void ExitFailed(Player player)
     {
-        Debug.Log(_caughtMessage);
-        
         // Можно добавить эффекты или звуки
         // Например, включить сирену, вызвать полицию и т.д.
         
         // Пока что просто перезагружаем текущую сцену
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-    
-    private void LoadEndScene()
-    {
-        SceneManager.LoadScene(_endSceneName);
+        SceneManager.LoadScene(_endSceneFailedName);
     }
     
     // Метод для тестирования

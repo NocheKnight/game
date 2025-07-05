@@ -1,5 +1,6 @@
 // D:/unity/projects/Kradylechka/Assets/Scripts/Enemy/States/ChaseState.cs
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ChaseState : IState
 {
@@ -44,6 +45,6 @@ public class ChaseState : IState
         // Здесь логика проигрыша
         _ai.Agent.isStopped = true;
         // _ai.Animator.SetTrigger("CatchPlayer");
-        Object.Destroy(_ai.Player.gameObject); // Например, удаляем игрока
+        SceneManager.LoadScene("GameOver");
     }
 }
