@@ -97,7 +97,6 @@ public class PlayerMover : MonoBehaviour
     private void Update()
     {
         HandleCrouchInput();
-        HandleStealthInput();
         UpdateCrouch();
         UpdateSpeed();
         UpdateNoiseLevel();
@@ -115,21 +114,12 @@ public class PlayerMover : MonoBehaviour
         if (shouldCrouch != _isCrouching)
         {
             _isCrouching = shouldCrouch;
+            _isStealthMode = shouldCrouch; // Присяд = стелс
             _targetHeight = _isCrouching ? _crouchingHeight : _standingHeight;
             CrouchChanged?.Invoke(_isCrouching);
-        }
-    }
-    
-    private void HandleStealthInput()
-    {
-        bool shouldStealth = Input.GetKey(KeyCode.LeftShift);
-        
-        if (shouldStealth != _isStealthMode)
-        {
-            _isStealthMode = shouldStealth;
             StealthModeChanged?.Invoke(_isStealthMode);
             
-            // Если включаем стелс, выключаем бег
+            // Если включаем стелс/присяд, выключаем бег
             if (_isStealthMode && _isRunning)
             {
                 _isRunning = false;

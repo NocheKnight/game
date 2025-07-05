@@ -92,8 +92,9 @@ public class Customer : MonoBehaviour
         var promoState = new CustomerPromoState(this);
         var reportState = new CustomerReportState(this);
 
-        _stateMachine.AddAnyTransition(fleeState, () => _hasWitnessedTheft);
+        // Приоритет: сначала пытаемся найти охранника, если не найден - убегаем
         _stateMachine.AddAnyTransition(reportState, () => _hasWitnessedTheft && FindNearestGuard() != null);
+        _stateMachine.AddAnyTransition(fleeState, () => _hasWitnessedTheft && FindNearestGuard() == null);
         
         _stateMachine.AddTransition(patrolState, promoState, () => _isLuredByPromo);
 

@@ -107,7 +107,9 @@
      <Compile Include="Assets\Scripts\UI\EndSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\GameOverUI.cs" />
      <Compile Include="Assets\Scripts\UI\GameUITester.cs" />
+     <Compile Include="Assets\Scripts\UI\PlayerStstsUI.cs" />
      <Compile Include="Assets\Scripts\UI\SimpleGameUI.cs" />
+     <Compile Include="Assets\Scripts\UI\SimplePlayerStatsUI.cs" />
      <Compile Include="Assets\Scripts\UI\WinUI.cs" />
      <None Include="Assets\FREE Food Pack\Shaders\Food.shader" />
      <None Include="Assets\BarProps\Credits.txt" />
