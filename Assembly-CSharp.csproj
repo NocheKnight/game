@@ -68,8 +68,6 @@
      <Compile Include="Assets\Scripts\Enemy\Customer\CustomerPatrolState.cs" />
      <Compile Include="Assets\Scripts\Enemy\Guards\GuardLogic.cs" />
      <Compile Include="Assets\Scripts\Enemy\Guards\SecurityGuard.cs" />
-     <Compile Include="Assets\Scripts\Enemy\SimpleEnemyAnimator.cs" />
-     <Compile Include="Assets\Scripts\Enemy\SimpleSuspicionIndicator.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\State.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\SuspiciousState.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\Transition.cs" />
@@ -84,7 +82,6 @@
      <Compile Include="Assets\Scripts\Enemy\States\IdleState.cs" />
      <Compile Include="Assets\Scripts\Enemy\States\InvestigateState.cs" />
      <Compile Include="Assets\Scripts\Enemy\States\PatrolState.cs" />
-     <Compile Include="Assets\Scripts\Enemy\SuspicionIndicator.cs" />
      <Compile Include="Assets\Scripts\Enemy\WorldSpaceSuspicionIndicator.cs" />
      <Compile Include="Assets\Scripts\Events\SuspicionEvents.cs" />
      <Compile Include="Assets\Scripts\ExitTrigger.cs" />
@@ -109,9 +106,7 @@
      <Compile Include="Assets\Scripts\UI\EndSceneController.cs" />
      <Compile Include="Assets\Scripts\UI\GameOverUI.cs" />
      <Compile Include="Assets\Scripts\UI\GameUITester.cs" />
-     <Compile Include="Assets\Scripts\UI\PlayerStatsUI.cs" />
      <Compile Include="Assets\Scripts\UI\SimpleGameUI.cs" />
-     <Compile Include="Assets\Scripts\UI\SimplePlayerStatsUI.cs" />
      <Compile Include="Assets\Scripts\UI\WinUI.cs" />
      <None Include="Assets\FREE Food Pack\Shaders\Food.shader" />
      <None Include="Assets\BarProps\Credits.txt" />
