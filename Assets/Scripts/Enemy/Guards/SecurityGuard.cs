@@ -38,7 +38,24 @@ public class SecurityGuard : Enemy
 
     public void Distract(Vector3 distractionPoint)
     {
-        // Реакция на отвлечение (аналогично кассирше)
+        Debug.Log($"{name} отвлечен на точку {distractionPoint}");
+        
+        // Добавляем подозрение при отвлечении
+        AddSuspicion(20f);
+        
+        // Если есть GuardLogic, используем его для более сложной логики
+        var guardLogic = GetComponent<GuardLogic>();
+        if (guardLogic != null)
+        {
+            guardLogic.AddSuspicion(30f, distractionPoint);
+        }
+        
+        // Можно добавить звуковой эффект
+        if (_backupCallSound != null)
+        {
+            var audio = GetComponent<AudioSource>();
+            if (audio != null) audio.PlayOneShot(_backupCallSound);
+        }
     }
 
     private new void CheckForPlayer()

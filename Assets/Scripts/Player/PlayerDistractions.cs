@@ -280,9 +280,28 @@ public class DistractionZone : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
         foreach (var hitCollider in hitColliders)
         {
+            // Реакция кассирши на отвлечение
             if (hitCollider.TryGetComponent<CashierGalya>(out var cashier))
             {
                 cashier.Distract(transform.position); 
+            }
+            
+            // Реакция покупателей на монетку
+            if (hitCollider.TryGetComponent<Customer>(out var customer))
+            {
+                customer.AnnouncePromo(transform.position);
+            }
+            
+            // Реакция охранников на отвлечение
+            if (hitCollider.TryGetComponent<SecurityGuard>(out var guard))
+            {
+                guard.Distract(transform.position);
+            }
+            
+            // Реакция через GuardLogic (если используется)
+            if (hitCollider.TryGetComponent<GuardLogic>(out var guardLogic))
+            {
+                guardLogic.AddSuspicion(10f, transform.position);
             }
         }
     }

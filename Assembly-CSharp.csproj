@@ -66,6 +66,7 @@
      <Compile Include="Assets\Scripts\Enemy\Customer\Customer.cs" />
      <Compile Include="Assets\Scripts\Enemy\Customer\CustomerFleeState.cs" />
      <Compile Include="Assets\Scripts\Enemy\Customer\CustomerPatrolState.cs" />
+     <Compile Include="Assets\Scripts\Enemy\Customer\CustomerReportState.cs" />
      <Compile Include="Assets\Scripts\Enemy\Guards\GuardLogic.cs" />
      <Compile Include="Assets\Scripts\Enemy\Guards\SecurityGuard.cs" />
      <Compile Include="Assets\Scripts\Enemy\State Machine\State.cs" />
