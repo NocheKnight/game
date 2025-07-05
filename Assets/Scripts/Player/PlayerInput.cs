@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PlayerMover))]
 [RequireComponent(typeof(PlayerInteraction))]

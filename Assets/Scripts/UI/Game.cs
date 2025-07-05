@@ -7,9 +7,4 @@ public class Game : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-
-    void onDestroy() {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
 }
