@@ -21,7 +21,14 @@ public class CustomerPromoState : IState
         {
             _customer.Agent.isStopped = false;
             _customer.Agent.speed = _customer.PromoSpeed;
-            if (_customer.Animator != null) _customer.Animator.SetBool("IsRunning", true);
+            
+            // Включаем анимацию бега для быстрого движения к акции
+            if (_customer.Animator != null)
+            {
+                _customer.Animator.SetBool("IsWalking", false);
+                _customer.Animator.SetBool("IsRunning", true);
+                _customer.Animator.SetFloat("Speed", _customer.PromoSpeed);
+            }
 
             _customer.Agent.SetDestination(_customer.PromoTargetLocation);
         }
@@ -38,10 +45,42 @@ public class CustomerPromoState : IState
         {
             _customer.LoseInterestInPromo();
         }
+        
+        // Обновляем анимацию на основе скорости движения
+        UpdateAnimationBasedOnSpeed();
     }
 
     public void Exit()
     {
-        if (_customer.Animator != null) _customer.Animator.SetBool("IsRunning", false);
+        // Выключаем анимацию бега
+        if (_customer.Animator != null)
+        {
+            _customer.Animator.SetBool("IsWalking", false);
+            _customer.Animator.SetBool("IsRunning", false);
+            _customer.Animator.SetFloat("Speed", 0f);
+        }
+    }
+    
+    private void UpdateAnimationBasedOnSpeed()
+    {
+        if (_customer.Animator == null || _customer.Agent == null) return;
+
+        float currentSpeed = _customer.Agent.velocity.magnitude;
+        float speedThreshold = 0.1f;
+
+        if (currentSpeed > speedThreshold)
+        {
+            // Если движемся быстро, включаем анимацию бега
+            _customer.Animator.SetBool("IsWalking", false);
+            _customer.Animator.SetBool("IsRunning", true);
+            _customer.Animator.SetFloat("Speed", currentSpeed);
+        }
+        else
+        {
+            // Если стоим, выключаем анимации движения
+            _customer.Animator.SetBool("IsWalking", false);
+            _customer.Animator.SetBool("IsRunning", false);
+            _customer.Animator.SetFloat("Speed", 0f);
+        }
     }
 }

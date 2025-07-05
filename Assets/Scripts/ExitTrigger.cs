@@ -30,7 +30,10 @@ public class ExitTrigger : MonoBehaviour
     }
     
     private bool CanExit(Player player)
-    {   
+    {
+        // Если не требуется стелс, то можно выйти всегда
+        if (!_requireStealth) return true;
+        
         // Проверяем, что игрок не в стелс-режиме (т.е. его не поймали)
         PlayerMover mover = player.GetComponent<PlayerMover>();
         if (mover != null && mover.IsStealthMode)
